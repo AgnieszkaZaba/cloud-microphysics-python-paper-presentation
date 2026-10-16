@@ -16,7 +16,7 @@ bibliography: refs.bib
 #| echo: false
 
 # enforcing inline vector graphics
-%xmode Minimal -q
+%xmode Minimal
 %config InlineBackend.figure_format = 'svg'
 
 # trigger font manager cache rebuild
@@ -49,12 +49,6 @@ matplotlib.rcParams.update(
 )
 
 ```
-
-
-## paper - TOC
-- artykuł krok po kroku jest tutorialem
-- poruszymy tylko kilka punktów, które wg nas są istotne
-  z punktu widzenia wykorzystania Pythona w modelowaniu, uczeniu dobrych praktyk
 
 
 ## Physical units in Python
@@ -254,16 +248,19 @@ quarto render paper.qmd --to pdf
 quarto render paper.ipynb --to pdf
 ```
 
-::: {.notes}
-- reproducible, journal friendly, for everyone
+--- 
+
+- reproducible!!! 
+- for everyone
 - journal templates as alternative to LaTeX templates
 - executable code for reproducible results (no copy-paste )
 - tests inside
-:::
+
 
 ## .ipynb/ Colab
 - structure of a file, everything in one
 
+https://egusphere.copernicus.org/preprints/2026/egusphere-2026-3906/
 
 ## Photos
 
