@@ -1,23 +1,42 @@
 
 /*-- scss:defaults --*/
-$body-bg: #1E1E1E;
-$body-color: #FF8996;
-$link-color: #33FF9C;
+$body-bg: #ffffff;
+$body-color: #000000;
+$link-color: #ff3333;
 
 .slide-logo {
   right: 10px !important;
   max-height: 10% !important;
   width: auto !important;
 }
-
-figure {
-  text-align: center;
+.title {
+  font-size: 200%!important;
 }
 
-figure img {
-  border-radius: 5px;
+figure, img.r-stretch {
+  text-align: center!important;
+}
+
+figure img, img.r-stretch, center img {
+  border-radius: 5px!important;
 }
 
 span.MathJax, div.MathJax_Display {
-  color: #99E8B5;
+  color: #096025;
+}
+
+quote {
+  color: #096025;
+}
+
+.reveal pre code {
+  font-size: 0.9em!important
+}
+
+div.ansi-escaped-output {
+  font-size: 0.8em!important
+}
+
+section#paper p, section#numba-mpi p, center img {
+  background-color: white!important;
 }

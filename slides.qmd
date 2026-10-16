@@ -3,199 +3,272 @@ title: "Exploring Cloud Microphysics Modeling Concepts the Pythonic Way"
 author: "Agnieszka Żaba, Sylwester Arabas"
 format:
   revealjs:
-#    theme: [moon, agh.scss]
+    theme: [agh.scss]
     background-transition: fade
+    
     footer: ZFS Seminar
     logo: https://www.agh.edu.pl/typo3conf/ext/agh_layout/Resources/Public/img/Logo.svg
     citation-style: https://raw.githubusercontent.com/citation-style-language/styles/master/chicago-notes-classic.csl 
 bibliography: refs.bib
 ---
 
+```{python}
+#| echo: false
 
-## Story
+# enforcing inline vector graphics
+%xmode Minimal -q
+%config InlineBackend.figure_format = 'svg'
 
-- na University of Washington, w Japonii, potem podczas EuroScipy na AGH
-- teraz jako publikacja w Geoscientific Model Development
-- zdjęcia z warsztatów
+# trigger font manager cache rebuild
+from matplotlib import figure
 
-## Przedstawiamy publikację, która jest jednocześnie tutorialem
+figure.Figure()
 
-- Python jako język, który stał się podstawowy na uczelni
-- industrial and scientific
-- 
+# AGH colours + colour-blind-safe linestyles + font sizes
+import matplotlib
+from cycler import cycler
+
+matplotlib.rcParams.update(
+    {
+        "axes.prop_cycle": cycler(color=("#A71930", "#00693C", "#1E1E1E"))
+        + cycler(linestyle=("-", "--", ":")),
+        "lines.linewidth": 1.5,
+        "lines.markersize": 5,
+        "axes.grid": True,
+        "font.size": 12,
+        "axes.labelsize": 12,
+        "axes.titlesize": 15,
+        "legend.fontsize": 12,
+        "xtick.labelsize": 12,
+        "ytick.labelsize": 12,
+        "figure.figsize": (6, 2.05),
+        "legend.handlelength": 1.0,
+        "figure.constrained_layout.use": True,
+        # "font.family": "Lato",
+    }
+)
+
+```
+
 
 ## paper - TOC
 - artykuł krok po kroku jest tutorialem
 - poruszymy tylko kilka punktów, które wg nas są istotne
-  z punktu widzenia wykorzystania Pythona w modelowaniu, uczeniu dobrych praktyk 
+  z punktu widzenia wykorzystania Pythona w modelowaniu, uczeniu dobrych praktyk
 
-::: {.incremental}
-1. @sec-sampling: aerosol size spectrum sampling, 
-2. -> @sec-units: unit-aware coding and plotting, 
-3. @sec-parcel-eqs: parcel model governing equations, 
-4. -> @sec-jit: JIT compilation using [Numba]{.smallcaps}, 
-5. @sec-ode: parcel ODE system definition, 
-6. -> @sec-dim-tests: test-time dimensional analysis using [Pint]{.smallcaps}, 
-7. @sec-ivp: initial condition at equilibrium, 
-8. @sec-odeint-plot: ODE integration and result analysis, 
-9. @sec-sdm: Super-Droplet Method algorithm, 
-10. @sec-golovin: SDM against analytic solution.
+
+## Physical units in Python
+Thanks to Kamil Kania presentation from EuroScipy
+
+units, tests (dimensional analysis), vector graphics
+
+::: {.notes}
+Must have: physical units ()
+W C++, w Julii, ..
+W Python nie jest to oczywiste jak to zrobić: wyzwaniem jest połączenie z numpy,
+  optymalizacja obliczeń (without overhead...)
 :::
 
 
-# Jednostki + testy (injectable constants) + wektorowa grafika
-Must have: fizyczne jednostki
-W C++, w Julii, ..
-W Python nie jest to oczywiste jak to zrobić: wyzwaniem jest połączenie z numpy, 
-  optymalizacja obliczeń (without overhead...)
+## a useful physical example: ideal gas
 
-## Physical Units in Python
-```python
-from collections import namedtuple
-import scipy.constants as sp_c
-import mendeleev as mv
-from PySDM import physics
+:::: {.columns}
 
-def constants():
-    si = physics.si
-    
-    M_d = ( # molar mass or dry air
-        0.78 * 2 * mv.N.atomic_weight * si.g / si.mol + 
-        0.21 * 2 * mv.O.atomic_weight * si.g / si.mol + 
-        0.01 * 1 * mv.Ar.atomic_weight * si.g / si.mol
-    )
-    M_v = ( # molar mass of water vapor
-        1 * mv.O.atomic_weight * si.g / si.mol + 
-        2 * mv.H.atomic_weight * si.g / si.mol
-    )
-    T_0C = sp_c.zero_Celsius * si.K
-    p_stp = 101.325 * si.kPa             # ICAO
-    T_stp = 15 * si.K + T_0C             # ICAO
-    R = sp_c.R * si.J / si.K / si.mol    # molar gas const
-    
-    co = namedtuple('Consts', (co := {
-        'R_d': (R_d := R / M_d),
-        'R_v': R / M_v,
-        'T_0C': T_0C,
-        'c_pd': 1 * si.kJ / si.kg / si.K, # heat capacity
-        'l_v': 45 * si.kJ / si.mol / M_v, # latent heat
-        'g': sp_c.g * si.m / si.s**2,     # grav. accel.
-        'ρ_w': 1 * si.kg / si.liter,  # liq. water density
-        'D_v': .25 * si.cm**2 / si.s, # vapor-in-air diff.
-        'σ_w': 72 * si.mJ / si.m**2,  # surf tension coef.
-        'ρ_stp': p_stp / R_d / T_stp, # ICAO
-        'r_0': 1 * si.nm,             # for ln(r/r_0)
-        'B80G0': 6.112 * si.hPa,      # Bolton 1980 
-        'B80G1': 17.67,               #   saturation vapor 
-        'B80G2': 243.5 * si.K,        #   pressure coeffs
-    }))(**co)
-    return co, si
-```
-## Dimensional Analysis
-```python
-#| label: fig-koehler
-#| fig-cap: "Köhler curves for four selected dry radii, with plot axes automatically labeled with units of the variables passed to the plotting function."
+::: {.column width="40%"}
+<span style="font-size:400%">🎈</span>
+<span style="font-size:200%">🎈</span>
+<span style="font-size:100%">🎈</span>
+<span style="font-size:50%">🎈</span>
+:::
 
-cfg_ccn['κ'] = 0.7
+::: {.column width="60%"}
 
-with DimensionalAnalysis():
-    co, si = constants()
-    si.setup_matplotlib()
+<h4>equation of state linking density $\rho$, pressure&nbsp;$p$ and temperature $T$</h4>
+$$\rho = (p M) / (T R)$$
 
-    cmn = {'co': co, 'κ': cfg_ccn['κ'], 'T': 300 * si.K}
-    step = cfg_ccn['n_sd'] // 4
-    for r_d in cfg_ccn['r_d'][::step] * si.m:
-        pyplot.semilogx(
-            r_w := np.logspace(-1, 1) * si.um,
-            eqs['RH_eq'](r_w=r_w, r_d=r_d, **cmn),
-            label=fr"$r_\text{{d}}$={r_d.to(si.nm):.3g~}",
-        )
-    pyplot.axhline(1, label="RH=100%", color='k')
-    pyplot.legend()
+$M$: molar mass
+$R$: universal gas constant
+:::
+
+::::
+
+## Issue \#1: units in code (example: ideal gas density)
+
+$$\rho = (p M) / (T R)$$
+
+```{python}
+import numpy, mendeleev, scipy.constants as ct, matplotlib.pyplot as plt
+
+p = 1000                                     # pressure [mbar]
+T = numpy.linspace(250, 300)                 # temperature [K]
+R = ct.R                                     # gas constant [J/K/mol]
+M = (0.78 * 2 * mendeleev.N.atomic_weight +  # molar mass [g/mol]
+     0.22 * 2 * mendeleev.O.atomic_weight)
+
+plt.plot(T, (p * M) / (R * T))
+plt.gca().set(ylabel="density", xlabel="temperature")
 ```
 
-# JIT + performance vs Fortran
-Must have: Numba
-Minimal knowledge and setup
-```python
-from numba import jit
-from functools import partial
-JIT = partial(jit, error_model='numpy',
-              fastmath=True, boundscheck=False)
+## Units with Pint
+
+
+:::: {.columns}
+
+::: {.column width="70%"}
+- <b><https://pint.readthedocs.io></b>
+
+- `%pip install pint`
+
+- `import pint`
+:::
+::: {.column width="30%"}
+    <img src="https://pint.readthedocs.io/en/stable/_static/logo-full.jpg">
+:::
+::::
+
+
+## Issue \#1: units in code (example: ideal gas density)
+
+$$\rho = (p M) / (T R)$$
+
+```{python}
+import pint
+(SI := pint.UnitRegistry()).setup_matplotlib()
+
+pressure = 1000 * SI.mbar
+temperatures = numpy.linspace(250, 300) * SI.K
+gas_const = ct.R * SI.J / SI.K / SI.mol
+molar_mass = (0.78 * 2 * mendeleev.N.atomic_weight +
+              0.22 * 2 * mendeleev.O.atomic_weight) * SI.g / SI.mol
+
+plt.plot(temperatures, (pressure * molar_mass) / (gas_const * temperatures))
 ```
 
-```python
-Eqs = namedtuple("Eqs", eqs.keys())
-eqp = Eqs(**eqs)
-eqj = Eqs(**{k: JIT(v) for k, v in eqs.items()})
+---
+
+```{python}
+#| echo: true
+axs = plt.gca()
+axs.xaxis.set_units(SI.degC)
+axs.yaxis.set_units(SI.kg / SI.m**3)
+plt.plot(temperatures, (pressure * molar_mass) / (gas_const * temperatures))
+axs.set_xlabel(f"temperature [{axs.xaxis.units:~P}]")
+axs.set_ylabel(f"density [{axs.yaxis.units:~P}]")
 ```
 
-## JIT compilation of SDM TODO
-```{.python code-line-numbers="2|4"} 
-from collections import abc
-from numba import prange
+::: {.fragment}
 
-@JIT(parallel=True)
-def sdm(
-    n_steps: int,
-    *,
-    ξ: abc.MutableSequence[int],
-    m: abc.MutableSequence[float],
-    kern: abc.Callable[[float, float], float],
-    Δt: float,
-    Δv: float,
-):
-    n_part = len(ξ)
-    n_pair = n_part // 2
-    perm = np.arange(n_part) 
-    for _ in range(n_steps):                         # <0>        
-        np.random.shuffle(perm)                      # <1>        
-        pairs = perm[: 2 * n_pair].reshape(-1, 2)    # <2>
-        p_ratio = n_part * (n_part - 1) / 2 / n_pair # <3>
-        for α in prange(n_pair):                     # <4>
-            j, k = pairs[α]                          # <5>
-            p_jk = kern(m[j], m[k]) * Δt / Δv        
-            if ξ[j] < ξ[k]:
-                j, k = k, j
-            p_α = ξ[j] * p_ratio * p_jk              # <6>
-            φ = np.random.random()                   # <7>
-            γ = p_α // 1 + ((p_α - p_α // 1) > φ)    # <8>
-            if γ != 0:
-                γ = min(γ, (ξ[j] / ξ[k]) // 1)       # <9>
-                if ξ[j] != γ * ξ[k]:
-                    ξ[j] -= γ * ξ[k]                
-                    m[k] += γ * m[j]
-                else:
-                    ξ[j] = ξ[k] // 2
-                    ξ[k] -= ξ[j]
-                    m[k] += γ * m[j]
-                    m[j] = m[k]
+```{python}
+#| echo: true
+#| error: true
+
+plt.gca().yaxis.set_units(SI.J)
+plt.plot(pressure)
 ```
 
-## Cloud microphysics example
-Przedstawienie przykładu, uruchomienie? 
-Wniosek: generalisable
+:::
+
+---
+
+#### different quantities on same axis?
+
+```{python}
+#| echo: true
+#| error: true
+try:
+    plt.plot(temperatures)
+    plt.plot(temperatures ** 2)
+except Exception as e:
+    plt.close()
+    print(e.__cause__)
+```
+
+::: {.fragment}
+<br>
+
+#### adding Kelvins to Pascals?
+
+```{python}
+#| echo: true
+#| error: true
+
+temperatures + molar_mass
+```
+
+:::
+
+::: {.fragment}
+<br>
+
+#### tools for unit testing
+
+```{python}
+#| echo: true
+
+((pressure * molar_mass) / (gas_const * temperatures)).check("[density]")
+```
+
+:::
+
+---
+
+### Pint: key takeaways
+
+- ⚖️ performs dimensional analysis (unit testing!)
+- ⚙️ automates plot axis labelling (and consistency checks)
+- 💱 handles SI prefixes and unit conversions
+- 🩺 helps in debugging (`print(x)` prints a value with unit)
+
+::: {.fragment}
+
+
+### Pint: key limitations
+
+- ⏱️ <s>incurs performance overhead</s>
+- 🔗 <s>no out-of-the-box interoperability with SciPy/Numba</s>
+
+
+
+:::
+
+
+
+## How to SciPy/Numba...
+see, our paper
+
+generalisable
 
 ## ![Quarto](img/quarto-icon.svg){ style="width:100px" } Quarto
 
 [Extensions -- quarto journals](https://quarto.org/docs/extensions/listing-journals.html) include:
 
 - American Geophysical Union (AGU)
+- Elsevier
 - Springer Nature Submissions
 - Association for Advancement of Artificial Intelligence (AAAI)
 - ...
 
+```{bash}
+quarto use template quarto-journals/agu
+quarto render paper.qmd --to pdf
+quarto render paper.ipynb --to pdf
+```
 
+::: {.notes}
 - reproducible, journal friendly, for everyone
 - journal templates as alternative to LaTeX templates
 - executable code for reproducible results (no copy-paste )
 - tests inside
+:::
 
 ## .ipynb/ Colab
 - structure of a file, everything in one
 
-## Easy to run, try it yourself
-- GMD editor, cytat maila od edytora GMD
 
-## Next
+## Photos
+
+- University of Washington, Japan, EuroSciPy
+
+Next: 
+
 Summer/Winter school 
