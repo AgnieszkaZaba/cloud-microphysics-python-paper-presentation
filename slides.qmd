@@ -5,19 +5,20 @@ format:
   revealjs:
     theme: [agh.scss]
     background-transition: fade
-    
+    fig-format: svg
     footer: ZFŚ Seminar, 22.10.2026
     logo: img/logo_zfs.svg
     citation-style: https://raw.githubusercontent.com/citation-style-language/styles/master/chicago-notes-classic.csl 
-bibliography: refs.bib
 ---
 
 ```{python}
 #| echo: false
 
-# enforcing inline vector graphics
-%xmode Minimal
-%config InlineBackend.figure_format = 'svg'
+from IPython import get_ipython
+
+ip = get_ipython()
+if ip is not None:
+    ip.InteractiveTB.mode = 'Minimal'
 
 # AGH colours + colour-blind-safe linestyles + font sizes
 import matplotlib
@@ -45,11 +46,32 @@ matplotlib.rcParams.update(
 
 ```
 
+## an experiment: paper on how to code
 
-## Physical units in Python
-Thanks to Kamil Kania presentation from EuroScipy
+![](img/gmd.svg){fig-align="center"}
 
-units, tests (dimensional analysis), vector graphics
+## scope of the paper and of this talk
+
+:::: {.columns}
+
+::: {.column width="75%"}
+1: aerosol size spectrum sampling    
+2: **unit-aware coding and plotting**    
+3: parcel model governing equations    
+4: JIT compilation using Numba    
+5: parcel ODE system definition    
+6: **test-time dimensional analysis using Pint**    
+7: initial condition at equilibrium    
+8: ODE integration and result analysis    
+9: Super-Droplet Method algorithm    
+10: SDM against analytic solution    
+::: 
+
+::: {.column width="25%"}
+TODO: Python+Pint logos?
+:::
+
+::::
 
 ::: {.notes}
 Must have: physical units ()
@@ -57,7 +79,6 @@ W C++, w Julii, ..
 W Python nie jest to oczywiste jak to zrobić: wyzwaniem jest połączenie z numpy,
   optymalizacja obliczeń (without overhead...)
 :::
-
 
 ## a useful physical example: ideal gas
 
@@ -227,6 +248,45 @@ see, our paper
 
 generalisable
 
+## no excuse for coding without units, let's&nbsp;teach&nbsp;it!
+
+:::: {.columns style="font-size: 0.5em;"}
+
+::: {.column width="33%"}
+"hacking aerosol-cloud μ-physics modeling concepts in Python" 
+
+**University of Washington**, Jan 2026, Seattle (Erasmus+ for teachers)
+
+![](img/seattle.jpg)
+::: 
+
+::: {.column width="33%"}
+FOSDEM 2026
+
+**Université libre de Bruxelles**, Feb 2026
+
+![](img/fosdem.png)
+::: 
+
+::: {.column width="33%"}
+"Gluing SciPy, Numba, and Pint to Bridge High Performance with Maintainability" 
+
+EuroScipy 2026 (Jul, **Wydział Informatyki AGH**)
+
+![](img/euroscipy.svg)
+::: 
+
++ **AGH courses**: PP, PI, MUP, MPS, RSE, ...
+
+::::
+
+## looking for a venue to publish it: GMD 
+
++ idea: code-in-paper
++ paper serving as ready-to-use workshop materials
++ GMD requirements: all figures reproducible by editors, reviewers, readers
++ our answer: everything in a single Jupyter notebook (i.e. single click generation of the paper pdf!)
+
 ## ![Quarto](img/quarto-icon.svg){ style="width:100px" } Quarto
 
 [Extensions -- quarto journals](https://quarto.org/docs/extensions/listing-journals.html) include:
@@ -250,17 +310,23 @@ quarto render paper.ipynb --to pdf
 - journal templates as alternative to LaTeX templates
 - executable code for reproducible results (no copy-paste )
 - tests inside
+- perfect for BEng/MSc/PhD theses!
 
+## Habemus Python 
 
-## .ipynb/ Colab
-- structure of a file, everything in one
+:::: {.columns}
 
-https://egusphere.copernicus.org/preprints/2026/egusphere-2026-3906/
+::: {.column width="40%"}
+![](https://github.com/habemus-python/quarto-reproducible-thesis/releases/download/tip/thesis.gif)
+:::
+::: {.column width="60%"}
+![](https://raw.githubusercontent.com/habemus-python/quarto-agh-slides/refs/heads/gif/slides.gif)
+:::
 
-## Photos
+::::
 
-- University of Washington, Japan, EuroSciPy
+## Summary and ideas
 
-Next: 
-
-Summer/Winter school 
++ encourage everyone to support their students in using Pint, Quarto, Habemus Python
++ AGH Summer/Winter school/workshop on cloud microphysics modelling using the GMD paper?
++ acknowledgements: Kamil, co-authors, ...
