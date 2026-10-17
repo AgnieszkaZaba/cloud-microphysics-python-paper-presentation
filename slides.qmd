@@ -325,6 +325,10 @@ quarto render paper.ipynb --to pdf
 
 ::::
 
+## Quarto Actions
+
+TODO
+
 ## Summary and ideas
 
 + encourage everyone to support their students in using Pint, Quarto, Habemus Python
