@@ -6,8 +6,8 @@ format:
     theme: [agh.scss]
     background-transition: fade
     
-    footer: ZFS Seminar
-    logo: https://www.agh.edu.pl/typo3conf/ext/agh_layout/Resources/Public/img/Logo.svg
+    footer: ZFŚ Seminar, 22.10.2026
+    logo: img/logo_zfs.svg
     citation-style: https://raw.githubusercontent.com/citation-style-language/styles/master/chicago-notes-classic.csl 
 bibliography: refs.bib
 ---
@@ -18,11 +18,6 @@ bibliography: refs.bib
 # enforcing inline vector graphics
 %xmode Minimal
 %config InlineBackend.figure_format = 'svg'
-
-# trigger font manager cache rebuild
-from matplotlib import figure
-
-figure.Figure()
 
 # AGH colours + colour-blind-safe linestyles + font sizes
 import matplotlib
