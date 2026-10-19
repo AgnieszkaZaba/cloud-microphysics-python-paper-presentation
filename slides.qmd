@@ -59,21 +59,29 @@ matplotlib.rcParams.update(
 
 ![](img/gmd.svg){fig-align="center"}
 
+
+
 ## scope of the paper and of this talk
 
 :::: {.columns}
 
 ::: {.column width="75%"}
-1: aerosol size spectrum sampling    
-2: **unit-aware coding and plotting**    
-3: parcel model governing equations    
-4: JIT compilation using Numba    
-5: parcel ODE system definition    
-6: **test-time dimensional analysis using Pint**    
-7: initial condition at equilibrium    
-8: ODE integration and result analysis    
-9: Super-Droplet Method algorithm    
-10: SDM against analytic solution    
+  Introduction
+
+1. aerosol size spectrum sampling     
+2. <span style="color:blue">**unit-aware coding and plotting**</span>  
+3. parcel model governing equations     
+4. JIT compilation using Numba     
+5. parcel ODE system definition     
+6. <span style="color:blue">**test-time dimensional analysis using Pint**     </span>
+7. initial condition at equilibrium     
+8. ODE integration and result analysis     
+9. Super-Droplet Method algorithm    
+10. SDM against analytic solution
+
+Summary
+
+<span style="color:blue">**Code availability**</span>
 ::: 
 
 ::: {.column width="25%"}
@@ -88,6 +96,9 @@ W C++, w Julii, ..
 W Python nie jest to oczywiste jak to zrobić: wyzwaniem jest połączenie z numpy,
   optymalizacja obliczeń (without overhead...)
 :::
+
+
+
 
 ## a useful physical example: ideal gas
 <br>
@@ -117,7 +128,7 @@ $R$: universal gas constant
 $$\rho = (p M) / (T R)$$
 
 ```{python}
-#| code-line-numbers: "1|1-2|1-8|1-11"
+#| code-line-numbers: "1|1-2|1-8|"
 
 import numpy, matplotlib.pyplot as plt
 import mendeleev, scipy.constants as ct
@@ -128,16 +139,22 @@ R = ct.R                                     # gas constant [J/K/mol]
 M = (0.78 * 2 * mendeleev.N.atomic_weight +  # molar mass [g/mol]
      0.22 * 2 * mendeleev.O.atomic_weight)
 
-plt.plot(T, (p * M) / (R * T))
-plt.gca().set(ylabel="density", xlabel="temperature")
+fig, axs = plt.figure(), plt.gca()
+axs.plot(T, (p * M) / (R * T))
+axs.set(ylabel="density", xlabel="temperature")
 ```
 
 
 ::: {.fragment}
 
-- What is the unit of the output? 
-- After changing the value of one of the variables - did you change the comment? 
-- Reproducible code; easy to read one year later
+TODO: red cross
+
+- The interpreter is not parsing the comments!
+
+- What is the unit of the plotted data? 
+- Reading the code, one needs to go to the definition each time.
+- No way of enforcing changes in usage upon change of definition.
+- After changing the value --- did you change the comment?
 
 How to fix it? 
 
@@ -168,10 +185,11 @@ How to fix it?
 $$\rho = (p M) / (T R)$$
 
 ```{python}
-#| code-line-numbers: "1-2|1-4|1-5|1-6|1-8|-"
+#| code-line-numbers: "1-3|1-5|1-6|1-7|1-9|-"
 
 import pint
-(SI := pint.UnitRegistry()).setup_matplotlib()
+SI = pint.UnitRegistry()
+SI.setup_matplotlib()
 
 pressure = 1000 * SI.mbar
 temperatures = numpy.linspace(250, 300) * SI.K
@@ -181,6 +199,9 @@ molar_mass = (0.78 * 2 * mendeleev.N.atomic_weight +
 
 plt.plot(temperatures, (pressure * molar_mass) / (gas_const * temperatures))
 ```
+
+Note: axis labels automatic!
+
 ---
 
 ### Can we ...
@@ -192,11 +213,11 @@ plt.plot(temperatures, (pressure * molar_mass) / (gas_const * temperatures))
 
 ::: {.fragment}
 ```{python}
-plt.gca().xaxis.set_units(SI.degC)
-plt.gca().yaxis.set_units(SI.kg / SI.m**3)
-plt.plot(temperatures, (pressure * molar_mass) / (gas_const * temperatures))
+fig, axs = plt.figure(), plt.gca()
+axs.xaxis.set_units(SI.degC)
+axs.yaxis.set_units(SI.kg / SI.m**3)
+axs.plot(temperatures, (pressure * molar_mass) / (gas_const * temperatures))
 
-axs = plt.gca()
 axs.set_xlabel(f"temperature [{axs.xaxis.units:~P}]")
 axs.set_ylabel(f"density [{axs.yaxis.units:~P}]");
 ```
@@ -239,6 +260,8 @@ except Exception as e:
     print(e.__cause__)
 ```
 :::
+
+<br>
 
 ::: {.fragment}
 
@@ -314,7 +337,6 @@ root_scalar(
 )
 ```
 
-<br>
 
 ::: {.fragment}
 
@@ -331,6 +353,7 @@ print(f"{f(2, -3, 270):.3g}")
 ```
 :::
 
+TODO: minimal error mode
 
 ::: {.fragment}
 ```{python}
@@ -344,7 +367,8 @@ f(2 * SI.K**2, -3 * SI.K, 270 * SI.K)
 ::: {.fragment}
 
 <br>
-### How to solve it?
+
+#### How to solve it?
 :::
 
 ::: {.fragment}
@@ -393,24 +417,22 @@ EuroScipy 2026 (Jul, **Wydział Informatyki AGH**)
 
 ## For reproducible science use ![Quarto](img/quarto-icon.svg){ style="height:1em" } `Quarto`
 
+<iframe src="https://quarto.org" width="100%" height="75%"></iframe>
+
+
+##
 
 Many [extensions](https://quarto.org/docs/extensions/listing-journals.html) with journal templates, including:
 
-::: {.incremental}
-- American Geophysical Union (AGU)
-- Elsevier
-- Springer Nature Submissions
-- Association for Advancement of Artificial Intelligence (AAAI)
-- etc.
-:::
+<iframe src="Quarto Journals.htm" width="100%" height="75%"></iframe>
 
-  
+## 
+### `quarto render paper.ipynb --execute --to copernicus-pdf`
+<iframe src="paper.pdf#page=30" width="100%" height="100%"></iframe>
 
+## simple setup for `.ipynb`, `.qmd` files [etc.](https://quarto.org/docs/get-started/)
 
-## simple setup for `.ipynb`, `.qmd`, `.tex` files [etc.](https://quarto.org/docs/get-started/)
-
-
-- run
+- example run
 ```{bash}
 quarto use template quarto-journals/agu
 quarto render paper.ipynb --to pdf
@@ -423,9 +445,11 @@ quarto render paper.ipynb --to pdf
   - `revealjs`
   - `html`
 
+This presentation is in `Quarto`!
+
 . . .
 
-- execute code when rendering
+- execute code when rendering (reproducibility requirement)
 ```{markdown}
 execute:
   echo: true
@@ -465,6 +489,7 @@ TODO
 
 ## Summary and ideas
 
++ 
 + encourage everyone to support their students in using Pint, Quarto, Habemus Python
 + AGH Summer/Winter school/workshop on cloud microphysics modelling using the GMD paper?
 + acknowledgements: Kamil, co-authors, ...
