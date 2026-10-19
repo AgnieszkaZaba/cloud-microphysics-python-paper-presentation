@@ -1,11 +1,19 @@
 ---
 title: "Exploring Cloud Microphysics Modeling Concepts the Pythonic Way"
 author: "Agnieszka Żaba, Sylwester Arabas"
+
+execute:
+  echo: true
+  enabled: true
+output-location: fragment
+  
 format:
   revealjs:
     theme: [agh.scss]
     background-transition: fade
     fig-format: svg
+    width: 1600
+    height: 1000
     footer: ZFŚ Seminar, 22.10.2026
     logo: img/logo_zfs.svg
     citation-style: https://raw.githubusercontent.com/citation-style-language/styles/master/chicago-notes-classic.csl 
@@ -13,7 +21,6 @@ format:
 
 ```{python}
 #| echo: false
-
 from IPython import get_ipython
 
 ip = get_ipython()
@@ -24,6 +31,7 @@ if ip is not None:
 import matplotlib
 from cycler import cycler
 
+%config InlineBackend.figure_formats = ['svg']
 matplotlib.rcParams.update(
     {
         "axes.prop_cycle": cycler(color=("#A71930", "#00693C", "#1E1E1E"))
@@ -31,22 +39,23 @@ matplotlib.rcParams.update(
         "lines.linewidth": 1.5,
         "lines.markersize": 5,
         "axes.grid": True,
-        "font.size": 12,
-        "axes.labelsize": 12,
+        "font.size": 13,
+        "axes.labelsize": 13,
         "axes.titlesize": 15,
-        "legend.fontsize": 12,
-        "xtick.labelsize": 12,
-        "ytick.labelsize": 12,
-        "figure.figsize": (6, 2.05),
+        "legend.fontsize": 13,
+        "xtick.labelsize": 13,
+        "ytick.labelsize": 13,
+        "figure.figsize": (10, 2.1),
         "legend.handlelength": 1.0,
         "figure.constrained_layout.use": True,
-        # "font.family": "Lato",
     }
 )
 
 ```
 
-## an experiment: paper on how to code
+[//]: # (![]&#40;https://www.geoscientific-model-development.net/graphic_egu_claim_logo_blue.png&#41;{width="1em"})
+
+##  an experiment: paper on how to code 
 
 ![](img/gmd.svg){fig-align="center"}
 
@@ -81,6 +90,7 @@ W Python nie jest to oczywiste jak to zrobić: wyzwaniem jest połączenie z num
 :::
 
 ## a useful physical example: ideal gas
+<br>
 
 :::: {.columns}
 
@@ -107,7 +117,10 @@ $R$: universal gas constant
 $$\rho = (p M) / (T R)$$
 
 ```{python}
-import numpy, mendeleev, scipy.constants as ct, matplotlib.pyplot as plt
+#| code-line-numbers: "1|1-2|1-8|1-11"
+
+import numpy, matplotlib.pyplot as plt
+import mendeleev, scipy.constants as ct
 
 p = 1000                                     # pressure [mbar]
 T = numpy.linspace(250, 300)                 # temperature [K]
@@ -119,8 +132,20 @@ plt.plot(T, (p * M) / (R * T))
 plt.gca().set(ylabel="density", xlabel="temperature")
 ```
 
-## Units with Pint
 
+::: {.fragment}
+
+- What is the unit of the output? 
+- After changing the value of one of the variables - did you change the comment? 
+- Reproducible code; easy to read one year later
+
+How to fix it? 
+
+:::
+
+## physical units in code with Pint
+
+<br> <br>
 
 :::: {.columns}
 
@@ -130,18 +155,21 @@ plt.gca().set(ylabel="density", xlabel="temperature")
 - `%pip install pint`
 
 - `import pint`
+
 :::
 ::: {.column width="30%"}
-    <img src="https://pint.readthedocs.io/en/stable/_static/logo-full.jpg">
+![](https://pint.readthedocs.io/en/stable/_static/logo-full.jpg)
 :::
 ::::
 
 
-## Issue \#1: units in code (example: ideal gas density)
+## physical units with Pint (example: ideal gas density)
 
 $$\rho = (p M) / (T R)$$
 
 ```{python}
+#| code-line-numbers: "1-2|1-4|1-5|1-6|1-8|-"
+
 import pint
 (SI := pint.UnitRegistry()).setup_matplotlib()
 
@@ -153,37 +181,55 @@ molar_mass = (0.78 * 2 * mendeleev.N.atomic_weight +
 
 plt.plot(temperatures, (pressure * molar_mass) / (gas_const * temperatures))
 ```
-
 ---
 
+### Can we ...
+
+::: {.fragment}
+
+- ... change the units on the plot?
+:::
+
+::: {.fragment}
 ```{python}
-#| echo: true
-axs = plt.gca()
-axs.xaxis.set_units(SI.degC)
-axs.yaxis.set_units(SI.kg / SI.m**3)
+plt.gca().xaxis.set_units(SI.degC)
+plt.gca().yaxis.set_units(SI.kg / SI.m**3)
 plt.plot(temperatures, (pressure * molar_mass) / (gas_const * temperatures))
+
+axs = plt.gca()
 axs.set_xlabel(f"temperature [{axs.xaxis.units:~P}]")
-axs.set_ylabel(f"density [{axs.yaxis.units:~P}]")
+axs.set_ylabel(f"density [{axs.yaxis.units:~P}]");
 ```
+
+:::
+
+::: {.fragment}
+
+- ... change the units to the wrong ones?
+:::
 
 ::: {.fragment}
 
 ```{python}
-#| echo: true
 #| error: true
 
 plt.gca().yaxis.set_units(SI.J)
 plt.plot(pressure)
 ```
-
 :::
 
 ---
 
-#### different quantities on same axis?
+### Can we ...
+
+::: {.fragment}
+
+- ... put different quantities on same axis?
+:::
+
+::: {.fragment}
 
 ```{python}
-#| echo: true
 #| error: true
 try:
     plt.plot(temperatures)
@@ -192,14 +238,17 @@ except Exception as e:
     plt.close()
     print(e.__cause__)
 ```
+:::
 
 ::: {.fragment}
-<br>
 
-#### adding Kelvins to Pascals?
+- ... add Kelvins to Pascals?
+:::
+
+
+::: {.fragment}
 
 ```{python}
-#| echo: true
 #| error: true
 
 temperatures + molar_mass
@@ -207,14 +256,13 @@ temperatures + molar_mass
 
 :::
 
-::: {.fragment}
 <br>
 
-#### tools for unit testing
+::: {.fragment}
+
+- Tools for unit testing:
 
 ```{python}
-#| echo: true
-
 ((pressure * molar_mass) / (gas_const * temperatures)).check("[density]")
 ```
 
@@ -224,29 +272,85 @@ temperatures + molar_mass
 
 ### Pint: key takeaways
 
+::: {.incremental}
 - ⚖️ performs dimensional analysis (unit testing!)
 - ⚙️ automates plot axis labelling (and consistency checks)
 - 💱 handles SI prefixes and unit conversions
 - 🩺 helps in debugging (`print(x)` prints a value with unit)
+:::
+
+
+::: {.fragment}
+### Pint: key limitations
+:::
 
 ::: {.fragment}
 
-
-### Pint: key limitations
-
 - ⏱️ <s>incurs performance overhead</s>
+:::
+::: {.fragment}
+
 - 🔗 <s>no out-of-the-box interoperability with SciPy/Numba</s>
-
-
-
 :::
 
 
 
-## How to SciPy/Numba...
-see, our paper
 
-generalisable
+## Issue \#2: units with `scipy` and `numba`
+
+Problem with using units with `scipy`/ `numpy` packages:
+```{python}
+#| error: true
+#| code-line-numbers: "1|1-3|-"
+
+from scipy.optimize import root_scalar
+
+f = lambda T, a, b: a / T + b
+
+root_scalar(
+    f=f,
+    x0=1 * SI.K,
+    args=(2 * SI.K**2, -3 * SI.K)
+)
+```
+
+<br>
+
+::: {.fragment}
+
+Problem with using just-in-time compilation (`numba`)
+```{python}
+#| code-line-numbers: "1|1-5|"
+import numba
+
+@numba.jit
+def f(a, b, T):
+  return a / T + b
+
+print(f"{f(2, -3, 270):.3g}")
+```
+:::
+
+
+::: {.fragment}
+```{python}
+#| error: true
+
+f(2 * SI.K**2, -3 * SI.K, 270 * SI.K)
+```
+
+::: 
+
+::: {.fragment}
+
+<br>
+### How to solve it?
+:::
+
+::: {.fragment}
+`see Section 4. in our paper!`
+
+:::
 
 ## no excuse for coding without units, let's&nbsp;teach&nbsp;it!
 
@@ -287,30 +391,60 @@ EuroScipy 2026 (Jul, **Wydział Informatyki AGH**)
 + GMD requirements: all figures reproducible by editors, reviewers, readers
 + our answer: everything in a single Jupyter notebook (i.e. single click generation of the paper pdf!)
 
-## ![Quarto](img/quarto-icon.svg){ style="width:100px" } Quarto
+## For reproducible science use ![Quarto](img/quarto-icon.svg){ style="height:1em" } `Quarto`
 
-[Extensions -- quarto journals](https://quarto.org/docs/extensions/listing-journals.html) include:
 
+Many [extensions](https://quarto.org/docs/extensions/listing-journals.html) with journal templates, including:
+
+::: {.incremental}
 - American Geophysical Union (AGU)
 - Elsevier
 - Springer Nature Submissions
 - Association for Advancement of Artificial Intelligence (AAAI)
-- ...
+- etc.
+:::
 
+  
+
+
+## simple setup for `.ipynb`, `.qmd`, `.tex` files [etc.](https://quarto.org/docs/get-started/)
+
+
+- run
 ```{bash}
 quarto use template quarto-journals/agu
-quarto render paper.qmd --to pdf
 quarto render paper.ipynb --to pdf
 ```
 
---- 
+. . .
 
+- render to
+  - `pdf`
+  - `revealjs`
+  - `html`
+
+. . .
+
+- execute code when rendering
+```{markdown}
+execute:
+  echo: true
+  enabled: true
+```
+
+---
+### Quarto: key takeaways
+
+::: {.incremental}
 - reproducible!!! 
 - for everyone
 - journal templates as alternative to LaTeX templates
-- executable code for reproducible results (no copy-paste )
+- executable code for reproducible results (no copy-paste)
 - tests inside
 - perfect for BEng/MSc/PhD theses!
+:::
+
+
 
 ## Habemus Python 
 

@@ -1,10 +1,3 @@
-Box with take-home-messeges
-
-
-
-
-Abstract
-
 ## Exploring Cloud Microphysics Modeling Concepts the Pythonic Way
 How can we model complex atmospheric processes with Python code that is readable,
   reliable, and computationally efficient?
