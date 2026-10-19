@@ -391,30 +391,60 @@ EuroScipy 2026 (Jul, **Wydział Informatyki AGH**)
 + GMD requirements: all figures reproducible by editors, reviewers, readers
 + our answer: everything in a single Jupyter notebook (i.e. single click generation of the paper pdf!)
 
-## ![Quarto](img/quarto-icon.svg){ style="width:100px" } Quarto
+## For reproducible science use ![Quarto](img/quarto-icon.svg){ style="height:1em" } `Quarto`
 
-[Extensions -- quarto journals](https://quarto.org/docs/extensions/listing-journals.html) include:
 
+Many [extensions](https://quarto.org/docs/extensions/listing-journals.html) with journal templates, including:
+
+::: {.incremental}
 - American Geophysical Union (AGU)
 - Elsevier
 - Springer Nature Submissions
 - Association for Advancement of Artificial Intelligence (AAAI)
-- ...
+- etc.
+:::
 
+  
+
+
+## simple setup for `.ipynb`, `.qmd`, `.tex` files [etc.](https://quarto.org/docs/get-started/)
+
+
+- run
 ```{bash}
 quarto use template quarto-journals/agu
-quarto render paper.qmd --to pdf
 quarto render paper.ipynb --to pdf
 ```
 
---- 
+. . .
 
+- render to
+  - `pdf`
+  - `revealjs`
+  - `html`
+
+. . .
+
+- execute code when rendering
+```{markdown}
+execute:
+  echo: true
+  enabled: true
+```
+
+---
+### Quarto: key takeaways
+
+::: {.incremental}
 - reproducible!!! 
 - for everyone
 - journal templates as alternative to LaTeX templates
-- executable code for reproducible results (no copy-paste )
+- executable code for reproducible results (no copy-paste)
 - tests inside
 - perfect for BEng/MSc/PhD theses!
+:::
+
+
 
 ## Habemus Python 
 
