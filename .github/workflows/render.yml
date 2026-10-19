@@ -31,7 +31,7 @@ jobs:
       - name: Install Python deps
         shell: bash
         run: |
-          python -m pip install matplotlib mendeleev pyyaml numpy numba ipykernel nbformat nbconvert
+          python -m pip install matplotlib mendeleev pyyaml numpy numba ipykernel nbformat nbconvert scipy pint
       - uses: quarto-dev/quarto-actions/setup@v2
       - if: runner.os == 'Windows'
         shell: bash
