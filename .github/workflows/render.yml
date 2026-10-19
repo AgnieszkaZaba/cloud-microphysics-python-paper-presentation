@@ -37,3 +37,9 @@ jobs:
         shell: bash
         run: echo "QUARTO_PYTHON=python" >> $GITHUB_ENV
       - run: quarto render slides.qmd --to revealjs
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: slides
+          path: slides.html
