@@ -3,14 +3,13 @@
 $body-bg: #ffffff;
 $body-color: #000000;
 $link-color: #ff3333;
+$main-font-size: 30px !default;
+$presentation-h1-font-size: 2.5em !default;
 
 .slide-logo {
   right: 10px !important;
   max-height: 10% !important;
   width: auto !important;
-}
-.title {
-  font-size: 200%!important;
 }
 
 figure, img.r-stretch {
@@ -30,7 +29,7 @@ quote {
 }
 
 .reveal pre code {
-  font-size: 0.9em!important
+  font-size: 1em!important
 }
 
 div.ansi-escaped-output {
@@ -39,4 +38,9 @@ div.ansi-escaped-output {
 
 section#paper p, section#numba-mpi p, center img {
   background-color: white!important;
+}
+
+.reveal .slide blockquote {
+  border-left: 3px solid;
+  padding-left: 0.5em;
 }
