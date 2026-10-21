@@ -55,40 +55,7 @@ matplotlib.rcParams.update(
 ```
 
 
-
-
-## `Python` and modeling? {.AZ}
-
-:::: {.columns}
-::: {.column width="30%"}
-The core of the language does not support:
-
-- ordinary int 
-- multi-dimensional arrays
-- JIT compilation
-- multi-threading
-- GPUs
-- numerical algorithms
-
-
-:::
-
-::: {.column .fragment width="70%"}
-
-![](img/StackOverflow.svg)
-:::
-::::
-
-But `Python` is designed as a **glue language**!
-
-Above features are handled by packages: **NumPy**(C), **SciPy**(C/Fortran/...), **Numba/JAX**(C++/...), and many more!
-
 ## {.AZ}
-##  an experiment: paper on how to code  {.AZ}
-
-::: {.notes}
-section titles, iframe widths, logos
-:::
 
 ![](img/gmd.svg){fig-align="center"}
 
@@ -137,16 +104,13 @@ Summary
 
 
 
-
-
 ## `Python` and modeling? {.AZ}
-
 :::: {.columns}
 ::: {.column width="30%"}
 The core of the language does not support:
 
 - ordinary int 
-- arrays
+- multi-dimensional arrays
 - JIT compilation
 - multi-threading
 - GPUs
@@ -163,8 +127,7 @@ The core of the language does not support:
 
 But `Python` is designed as a **glue language**!
 
-Above features are handled by packages: **NumPy**, **SciPy**, **Numba/JAX**
-
+Above features are handled by packages: **NumPy**(C), **SciPy**(C/Fortran/...), **Numba/JAX**(C++/...), and many more!
 
 
 # unit-aware coding and plotting
