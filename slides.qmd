@@ -65,7 +65,7 @@ matplotlib.rcParams.update(
 The core of the language does not support:
 
 - ordinary int 
-- arrays
+- multi-dimensional arrays
 - JIT compilation
 - multi-threading
 - GPUs
@@ -82,9 +82,9 @@ The core of the language does not support:
 
 But `Python` is designed as a **glue language**!
 
-Above features are handled by packages: **NumPy**, **SciPy**, **Numba/JAX**
+Above features are handled by packages: **NumPy**(C), **SciPy**(C/Fortran/...), **Numba/JAX**(C++/...), and many more!
 
-##  an experiment: paper on how to code  {.AZ}
+## {.AZ}
 
 ::: {.notes}
 section titles, iframe widths, logos
@@ -252,7 +252,7 @@ plt.plot(temperatures, (pressure * molar_mass) / (gas_const * temperatures))
 - axis labels automatic
 :::
 
-## 
+## {.AZ}
 ### Can we ...
 
 ::: {.fragment}
@@ -370,6 +370,8 @@ temperatures + pressure
 - 🩺 helps in debugging (`print(x)` prints a value with unit)
 :::
 
+<br>
+<br>
 
 ::: {.fragment}
 ### Pint: key limitations
@@ -433,34 +435,70 @@ f(2 * SI.K**2, -3 * SI.K, 270 * SI.K)
 
 ::: 
 
-## How to use units with `scipy` and `numba`? {.SA}
+## Using `Pint` with `SciPy` solvers or with `Numba` JIT compiler {.SA}
 
-`see Section 4. in our paper!`
+(`see Section 4. in the preprint`, based on MSc thesis of Daria Klimaszewska)
 
+<center><b>
+  injectable constants-catalogue idiom
+</b></center>
 
-TODO: Concept
+<br >
+
+::: {.fragment}
+
+💡 key (physics) principle: dimensionality of physical quantities originates from <b>constants</b> only!    
+&nbsp;❶ $\leadsto$ instantiate a constants catalogue at <b>topmost scope</b>, pass to all physics-related functions    
+&nbsp;❷ $\leadsto$ use <b>unit-aware</b> constants catalogue for unit testing    
+&nbsp;❸ $\leadsto$ use <b>plain-floats</b> constants catalogue elsewhere
+
+:::
+
+<br>
+
+::: {.fragment}
+
+- ✅ no trade-off in <b>code readibility</b> or <b>performance</b> 
+- ✅ no trade-off in <b>functionality</b> (e.g., SI prefixes, unit conversions, ...)
+- ✅ no trade-off in <b>interoperability</b> with numerical routines or JIT compilers
+- 💡 works with <b>any language</b> supporting JIT compilation (e.g., Julia) or templates (e.g., C++)
+- ➕ positive side-effect: enforces <b>separation of concerns</b>
+
+:::
 
 ## no excuse for coding without units, let's&nbsp;teach&nbsp;it! {.SA}
 
-:::: {.columns style="font-size: 1em;"}
+<br>
+
+:::: {.columns style="font-size: .9em;"}
 
 ::: {.column width="33%"}
 "hacking aerosol-cloud μ-physics modeling concepts in Python" 
 
-**University of Washington**, Jan 2026, Seattle (Erasmus+ for teachers)
+**University of Washington**, Jan 2026, Erasmus+ in Seattle
 
 ![](img/seattle.jpg)
 ::: 
 
 ::: {.column width="33%"}
-FOSDEM 2026
 
-**Université libre de Bruxelles**, Feb 2026
+<br>
+<br>
+
+FOSDEM 2026 (Jan/Feb)
+
+**Université libre de Bruxelles**
 
 ![](img/fosdem.png)
 ::: 
 
 ::: {.column width="33%"}
+
+<br>
+<br>
+<br>
+<br>
+
 "Gluing SciPy, Numba, and Pint to Bridge High Performance with Maintainability" 
 
 EuroScipy 2026 (Jul, **Wydział Informatyki AGH**)
@@ -544,10 +582,43 @@ This presentation is in `Quarto`, including code execution!
 
 <iframe src="pages/Quarto Journals.html" width="100%" height="75%"></iframe>
 
+## Quarto in Nature {.AZ}
+
+![](img/perkel.svg)
 
 # Quarto: Apt for BEng/MSc/PhD theses
 
-## Other universities {.SA}
+## University Quarto templates (theses, slides, letters) {.SA}
+
+<br>
+<br>
+
+:::: {.columns}
+
+::: {.column width="40%"}
+
+- 🇦🇺 monash.edu (Melbourne)
+- 🇳🇱 uu.nl (Utrecht)
+- 🏴󠁧󠁢󠁳󠁣󠁴󠁿 ed.ac.uk (Edinburgh)
+- 🇬🇧 warwick.ac.uk (Warwick)
+- 🇦🇺 mq.edu.au (Sydney)
+- 🇺🇸 gatech.edu (Atlanta, GA)
+- 🇩🇰 au.dk (Aarhus)
+- 🇺🇸 unm.edu (Albuquerque, NM)
+
+:::
+
+::: {.column width="60%"}
+
+![](img/quarto-monash.svg)
+
+:::
+
+::::
+
+## Habemus Python `https://habemus-python.github.io` {.SA}
+
+![](img/habemus.svg)
 
 ## Habemus Python `https://habemus-python.github.io` {.SA}
 
@@ -562,17 +633,18 @@ This presentation is in `Quarto`, including code execution!
 
 ::::
 
-## Quarto Actions {.SA}
-
-TODO
-
-## Summary and outlook
+## Summary and outlook {.AZ}
 
 ::: {.incremental}
-- Pint: no excuse to write code without units!
-- Quarto: please support your students
-- paper (can be run on Colab):
-  DOI: `10.5194/egusphere-2026-3906`
+- ⚖️ <b>Pint</b> (or Boost.Units in C++, UnitFull.jl in Julia, ...):    
+  $\leadsto$ no excuse to write code without units.
+<br>
+- 📝 <b>Quarto</b>:   
+  $\leadsto$ highly encourage to embrace it with your mentees and mentors!
+<br>
+- 🌧️ <b>cloud/aerosol-µ-physics preprint</b> in public peer review in GMD:   
+  $\leadsto$ DOI: `10.5194/egusphere-2026-3906` (Colab-ready Quarto/Jupyter notebook as suppl.)
+- 💡 idea: <b>workshop/summer-school</b> @AGH?
 :::
 
 . . .
@@ -581,9 +653,10 @@ TODO
 
 ::: {style="text-align: center;"}
 
+🙏   
 **Thank you for your attention!**
 
-Acknowledgements: Kamil Kania & the paper's co-authors
+acknowledgments: Kamil Kania & the paper co-authors
 
 :::
 
