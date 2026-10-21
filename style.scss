@@ -83,3 +83,27 @@ div.ansi-escaped-output {
   top: 10px !important;
   bottom: auto !important;
 }
+
+.reveal .card {
+  padding: 0 0.6em;
+  font-size: 0.82em;
+}
+
+
+.reveal .card h3 {
+  border-top: 3px solid #3984b6;
+  padding-top: 0.45em;
+  margin-top: 0;
+}
+
+.reveal .card li {
+  margin-bottom: 0.45em;
+}
+
+.reveal img.card-logo {
+  display: block;
+  margin: 0 auto 0.6em;
+  height: 120px;
+  width: auto;
+  max-width: 90%;
+}

@@ -429,7 +429,6 @@ assert density.check("[density]")
 :::
 
 
-# **JIT compilation using Numba** {.SA}
 
 ## Issue: units with `SciPy` and `Numba` {.SA}
 
@@ -549,44 +548,57 @@ EuroScipy 2026 (Jul, **Wydział Informatyki AGH**)
 
 ::: 
 
-+ **AGH courses**: PP, PI, MUP, MPS, RSE, ...
++ **AGH courses**: PP, PI, MUP, MPS, RSE, MPTS, PTS...
 
 ::::
 
-## looking for a venue and tool to publish it  {.AZ}
+## From executable code to a reproducible scientific paper {.AZ}
 
-:::: {.columns}
-::: {.column width="20%"}
+:::: {.columns gap="1em"}
 
-![](https://raw.githubusercontent.com/open-atmos/PySDM/main/docs/logos/pysdm_logo.svg){width="60%"}
+::: {.column width="30%" .card}
+![](https://raw.githubusercontent.com/open-atmos/PySDM/main/docs/logos/pysdm_logo.svg){.card-logo}
 
-![](https://www.geoscientific-model-development.net/graphic_egu_claim_logo_blue.png)
+### Idea
 
-![](https://jupyter.org/assets/jupyter/logo/rectanglelogo-greytext-orangebody-greymoons.svg)
-
-![](https://quarto.org/assets/images/quarto.png)
-
-
-:::
-
-::: {.column width="80%"}
-
-+ idea: 
-  + use cloud-microphysics modeling as an example 
-  + code-in-paper 
-  + paper serving as ready-to-use workshop materials 
-  + all figures reproducible by editors, reviewers, readers
-+ venue: 
-  + EGU Geoscientific Model Development: review and perspective paper
-  + reproducibility is required by GMD
-+ tool: 
-  + everything in a single `Jupyter notebook` 
-  + `Quarto` single click generation of the paper pdf!
+- Cloud microphysics as a case study
+- Executable code embedded in the paper
+- Ready-to-use workshop materials
+- Reproducible results and figures
 
 :::
+
+::: {.column width="30%" .card}
+![](https://www.egu.eu/media/filer_public_thumbnails/filer_public/d6/74/d6743648-b771-4814-bf54-23b3d486dd50/gmd.png__250x250_subsampling-2_upscale.webp){.card-logo}
+
+### Venue
+
+- Geoscientific Model Development (GMD)
+- Review and perspective paper 
+- GMD’s reproducibility requirements
+:::
+
+::: {.column width="30%" .card}
+![](https://jupyter.org/assets/homepage/main-logo.svg){.card-logo}
+![](img/quarto-logo.svg){.card-logo}
+
+### Tools
+
+- Jupyter for executable code
+- Quarto for paper generation
+- Automated tests and reproducible outputs
+:::
+
 ::::
 
-# <quote> Code availability </quote>
+<br><br>
+
+::: {.callout-bottom .fragment style="text-align: center;"}
+### One executable source $\leadsto$ Paper + Figures + Workshop
+
+Reproducible by authors, editors, reviewers, and readers
+:::
+
 
 ## For reproducible science use `Quarto.org` {.AZ}
 
@@ -595,6 +607,7 @@ EuroScipy 2026 (Jul, **Wydział Informatyki AGH**)
 $\rightarrow$ Get started
 
 
+# <quote> Code availability </quote>
 ## For reproducible science use `Quarto` {.AZ}
 ### `quarto render paper.ipynb --execute --to copernicus-pdf`
 <iframe
@@ -616,6 +629,11 @@ $\rightarrow$ Get started
   - BibTeX 
   - $\LaTeX$ syntax
   - vector graphics
+
+. . .
+
+keep-md: true
+keep-tex
 
 . . . 
 
@@ -703,13 +721,3 @@ acknowledgments: Kamil Kania & the paper co-authors
 
 :::
 
-
-
-
-::: {.notes}
-
-+ encourage everyone to support their students in using Pint, Quarto, Habemus Python
-+ AGH Summer/Winter school/workshop on cloud microphysics modeling using the GMD paper?
-+ acknowledgements: Kamil, co-authors, ...
-
-:::
