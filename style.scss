@@ -2,12 +2,12 @@
 /*-- scss:defaults --*/
 $body-bg: #ffffff;
 $body-color: #000000;
-$link-color: #ff3333;
+$link-color: #3c74a6;
 $main-font-size: 30px !default;
-$presentation-h1-font-size: 2.5em !default;
+$presentation-h1-font-size: 2.2em !default;
 
 .slide-logo {
-  right: 10px !important;
+  right: 6px !important;
   max-height: 10% !important;
   width: auto !important;
 }
@@ -43,4 +43,24 @@ section#paper p, section#numba-mpi p, center img {
 .reveal .slide blockquote {
   border-left: 3px solid;
   padding-left: 0.5em;
+}
+
+.reveal .slides section.AZ::after,
+.reveal .slides section.SA::after {
+  position: absolute;
+  bottom: 1px;
+  left: 10px;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  content: "";
+}
+
+//#287fcc #ffcf00 #f3635c
+.reveal .slides section.AZ::after {
+  background: #f3635c
+}
+
+.reveal .slides section.SA::after {
+  background: #287fcc;
 }

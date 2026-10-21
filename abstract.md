@@ -1,5 +1,12 @@
-## Exploring Cloud Microphysics Modeling Concepts the Pythonic Way
-How can we model complex atmospheric processes with Python code that is readable,
+---
+title: "Exploring Cloud Microphysics Modeling Concepts the Pythonic Way"
+author: "Agnieszka Żaba, Sylwester Arabas"
+---
+
+# _Exploring Cloud Microphysics Modeling Concepts the Pythonic Way_
+
+
+How can we model physical processes with Python code that is readable,
   reliable, and computationally efficient?
 
 This seminar presents selected concepts from the publication
@@ -12,7 +19,7 @@ We will explore the ways to handle physical dimensions and units in Python code,
 We will also demonstrate how Jupyter notebooks and Quarto facilitate
   reproducible scientific writing by integrating into a single file 
   all computations, creation of figures, text formatting,
-  bibliography menagement, and rendering to the final paper pdf. 
+  bibliography management, and rendering to the final paper pdf. 
 This approach supports the scientific method by ensuring full reproducibility,
   which is among the review requirements of the GMD journal.
 
