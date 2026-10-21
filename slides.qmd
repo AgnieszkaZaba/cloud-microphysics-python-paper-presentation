@@ -14,8 +14,10 @@ format:
     fig-format: svg
     width: 1600
     height: 1000
+    menu: 
+      side: right
     footer: ZFŚ Seminar, 22.10.2026
-    logo: img/logo_zfs.svg
+    logo: https://open-atmos-krk.github.io/img/logoagh.svg
     citation-style: https://raw.githubusercontent.com/citation-style-language/styles/master/chicago-notes-classic.csl 
 ---
 
@@ -54,18 +56,48 @@ matplotlib.rcParams.update(
 ```
 
 
+
+
+## `Python` and modeling? {.AZ}
+
+:::: {.columns}
+::: {.column width="30%"}
+The core of the language does not support:
+
+- ordinary int 
+- arrays
+- JIT compilation
+- multi-threading
+- GPUs
+- numerical algorithms
+
+
+:::
+
+::: {.column .fragment width="70%"}
+
+![](img/StackOverflow.svg)
+:::
+::::
+
+But `Python` is designed as a **glue language**!
+
+Above features are handled by packages: **NumPy**, **SciPy**, **Numba/JAX**
+
 ##  an experiment: paper on how to code  {.AZ}
+
+::: {.notes}
+section titles, iframe widths, logos
+:::
 
 ![](img/gmd.svg){fig-align="center"}
 
-
-
-## scope of the paper and of this talk
+## scope of the paper and of this talk {.AZ}
 
 :::: {.columns}
 
 ::: {.column width="75%"}
-  Introduction
+  <span style="color:#287fcc">Introduction</span> 
 
 1. aerosol size spectrum sampling     
 2. <span style="color:#287fcc">**unit-aware coding and plotting**</span>  
@@ -94,7 +126,10 @@ Summary
 
 ::::
 
-## `python` as a glue language
+
+
+
+
 
 # unit-aware coding and plotting
 ## a useful physical example: ideal gas {.AZ}
@@ -126,10 +161,6 @@ $$\rho = (p M) / (T R)$$
 
 . . .
 
-Spoiler: DON'T
-
-. . .
-
 ```{python}
 #| code-line-numbers: "1|1-2|1-8|"
 
@@ -149,53 +180,49 @@ axs.set(ylabel="density", xlabel="temperature")
 
 . . .
 
+
+“_<quote>The proper use of comments is to compensate for our failure to express ourself in code ... 
+Comments are always failures.</quote>_” (Robert C. Martin [_Clean Code_, 2009](https://books.google.pl/books/about/Clean_Code.html?id=EpeDEQAAQBAJ&redir_esc=y))
+
+
+## Issue: units in comments not in code {.AZ} 
+
 The interpreter is not parsing the comments!
-On the paper we always use units, use it in code as well.
 
-## Issue: units in comments not in code {.AZ}
+We always use units on paper, use it in code as well.
 
+```{python}
+fig
+```
 ::: {.incremental}
-- What is the unit of the plotted data? Is it a correct one?
+- What is the unit of the plotted data?
 - Reading the code, one needs to go to the definition each time.
 - No way of enforcing changes in usage upon change of definition.
 - After changing the value --- did you change the comment?
-- We all know the answer...
+
+  We all know the answer...
 :::
 
 
-## Issue: units in comments not in code {.AZ}
 
-“_<quote>The proper use of comments is to compensate for our failure to express ourself in code ... 
-Comments are always failures.</quote>_”
-
-<br>
-
-**Robert C. Martin**<br> Clean Code: A Handbook of Agile Software Craftsmanship
-
-. . .
-
-### How to fix our example?
-
-
-
-## physical units in code with Pint {.AZ}
+## physical units in code with `Pint` {.AZ}
 
 <br> <br>
 
 :::: {.columns}
 
-::: {.column width="70%"}
-- <b><https://pint.readthedocs.io></b>
+::: {.column width="50%"}
 
-- `%pip install pint`
-
-- `import pint`
+<iframe src="pages/MetPy_NSF_Unidata.html" width="100%" height="650 pt"></iframe>
 
 :::
-::: {.column width="30%"}
-![](https://pint.readthedocs.io/en/stable/_static/logo-full.jpg)
+::: {.column width="50%"}
+
+<iframe src="https://pint.readthedocs.io/en/stable/getting/overview.html" width="100%" height="650 pt"></iframe>
+
 :::
 ::::
+
 
 
 ## physical units with Pint (example: ideal gas density) {.AZ}
@@ -230,16 +257,14 @@ plt.plot(temperatures, (pressure * molar_mass) / (gas_const * temperatures))
 
 ::: {.fragment}
 
-- ... change the units on the plot?
+- ... change units on plot?
 :::
 
 ::: {.fragment}
 ```{python}
 fig, axs = plt.figure(), plt.gca()
-
 axs.xaxis.set_units(SI.degC)
 axs.yaxis.set_units(SI.kg / SI.m**3)
-
 axs.plot(temperatures, (pressure * molar_mass) / (gas_const * temperatures))
 ```
 :::
@@ -253,7 +278,6 @@ axs.plot(temperatures, (pressure * molar_mass) / (gas_const * temperatures))
 ```{python}
 fig, axs = plt.figure(), plt.gca()
 axs.plot(temperatures, (pressure * molar_mass) / (gas_const * temperatures))
-
 axs.set_xlabel(f"temperature [{axs.xaxis.units:~P}]")
 axs.set_ylabel(f"density [{axs.yaxis.units:~P}]");
 ```
@@ -264,7 +288,7 @@ to_base_units
 pretty formatting
 :::
 
-## test-time dimensional analysis using Pint {.AZ}
+## dimensional analysis using Pint {.AZ}
 
 . . .
 
@@ -279,7 +303,6 @@ pretty formatting
 
 ```{python}
 #| error: true
-
 plt.gca().yaxis.set_units(SI.J)
 plt.plot(pressure)
 ```
@@ -364,9 +387,9 @@ temperatures + pressure
 
 
 
-## Issue: units with `SciPy` and `Numba` {.AZ}
+## Issue: units with `SciPy` and `Numba` {.SA}
 
-Problem with using units with `scipy`/ `numpy` packages:
+Problem with using units with `SciPy`/ `NumPy` packages:
 ```{python}
 #| error: true
 #| code-line-numbers: "1|1-3|-"
@@ -387,7 +410,7 @@ root_scalar(
 
 <br>
 
-Problem with using just-in-time compilation (`numba`)
+Problem with using just-in-time compilation (`Numba`)
 ```{python}
 #| code-line-numbers: "1|1-5|"
 import numba
@@ -400,9 +423,6 @@ print(f"{f(2, -3, 270):.3g}")
 ```
 :::
 
-::: {.notes}
-TODO: minimal error mode
-:::
 
 ::: {.fragment}
 ```{python}
@@ -413,15 +433,16 @@ f(2 * SI.K**2, -3 * SI.K, 270 * SI.K)
 
 ::: 
 
-## How to use units with `scipy` and `numba`? {.AZ}
+## How to use units with `scipy` and `numba`? {.SA}
 
 `see Section 4. in our paper!`
+
 
 TODO: Concept
 
 ## no excuse for coding without units, let's&nbsp;teach&nbsp;it! {.SA}
 
-:::: {.columns style="font-size: 0.5em;"}
+:::: {.columns style="font-size: 1em;"}
 
 ::: {.column width="33%"}
 "hacking aerosol-cloud μ-physics modeling concepts in Python" 
@@ -444,80 +465,91 @@ FOSDEM 2026
 
 EuroScipy 2026 (Jul, **Wydział Informatyki AGH**)
 
-![](img/euroscipy.svg)
+![](https://open-atmos-krk.github.io/img/euroscipy2026.png)
+
 ::: 
 
 + **AGH courses**: PP, PI, MUP, MPS, RSE, ...
 
 ::::
 
-## looking for a venue to publish it: GMD {.SA}
+## looking for a venue and tool to publish it  {.AZ}
 
-+ idea: code-in-paper
-+ paper serving as ready-to-use workshop materials
-+ GMD requirements: all figures reproducible by editors, reviewers, readers
-+ our answer: everything in a single Jupyter notebook (i.e. single click generation of the paper pdf!)
+:::: {.columns}
+::: {.column width="20%"}
 
-## For reproducible science use `Quarto` {.AZ}
-... like the paper and this presentation (including code execution)
+![](https://raw.githubusercontent.com/open-atmos/PySDM/main/docs/logos/pysdm_logo.svg){width="60%"}
+
+![](https://www.geoscientific-model-development.net/graphic_egu_claim_logo_blue.png)
+
+![](https://jupyter.org/assets/jupyter/logo/rectanglelogo-greytext-orangebody-greymoons.svg)
+
+![](https://quarto.org/assets/images/quarto.png)
+
+
+:::
+
+::: {.column width="80%"}
+
+::: {.incremental}
++ idea: 
+  + use cloud-microphysics modeling as an example 
+  + code-in-paper 
+  + paper serving as ready-to-use workshop materials 
+  + all figures reproducible by editors, reviewers, readers
++ venue: 
+  + EGU Geoscientific Model Development: review and perspective paper
+  + reproducibility is required by GMD
++ tool: 
+  + everything in a single `Jupyter notebook` 
+  + `Quarto` single click generation of the paper pdf!
+:::
+
+:::
+::::
+## For reproducible science use `Quarto.org` {.AZ}
 
 <iframe src="https://quarto.org" width="100%" height="75%"></iframe>
 
+$\rightarrow$ Get started
 
-
-
-## {.AZ}
-### `quarto render paper.ipynb --execute --to copernicus-pdf`
-<iframe src="paper.pdf#page=30" width="100%" height="100%"></iframe>
-
-## simple setup for `.ipynb`, `.qmd` files [etc.](https://quarto.org/docs/get-started/) {.AZ}
-
-- example run
-```{bash}
-quarto use template quarto-journals/agu
-quarto render paper.ipynb --to pdf
-```
-
-. . .
-
-- render to
-  - `pdf`
-  - `revealjs`
-  - `html`
-
-This presentation is in `Quarto`!
-
-. . .
-
-- execute code when rendering (reproducibility requirement)
-```{markdown}
-execute:
-  echo: true
-  enabled: true
-```
-
-## {.AZ}
-
-Many extensions with journal templates, including:
-
-<iframe src="Quarto Journals.htm" width="100%" height="75%"></iframe>
-
-
-## {.AZ}
-
-### Quarto: key takeaways
-
-::: {.incremental}
-- for everyone
-- journal templates as alternative to LaTeX templates
-- executable code for reproducible results (no copy-paste)
-- tests inside
-- perfect for BEng/MSc/PhD theses!
+::: {.notes}
+... like the paper and this presentation (including code execution)
+TODO width of iframes!
 :::
 
+## For reproducible science use `Quarto` {.AZ}
+### `quarto render paper.ipynb --execute --to copernicus-pdf`
+<iframe src="paper.pdf#page=30" width="100%" height="75%"></iframe>
+
+## For reproducible science use `Quarto` {.AZ}
+
+- useful for working on 
+  - articles, reports, theses, books (`pdf`, `epub`, ...)
+  - presentations, teaching materials (`revealjs`, `beamer`, ...)
+  - web pages, data access and quick look dashboards (`html`, ...)
+
+. . .
+
+- supports 
+  - BibTeX 
+  - $\LaTeX$ syntax
+  - vector graphics
+
+. . . 
+
+This presentation is in `Quarto`, including code execution!
+
+## Journal templates from major publishers {.AZ}
+
+<iframe src="pages/Quarto Journals.html" width="100%" height="75%"></iframe>
 
 
-## Habemus Python {.SA}
+# Quarto: Apt for BEng/MSc/PhD theses
+
+## Other universities {.SA}
+
+## Habemus Python `https://habemus-python.github.io` {.SA}
 
 :::: {.columns}
 
@@ -534,9 +566,34 @@ Many extensions with journal templates, including:
 
 TODO
 
-## Summary and ideas
+## Summary and outlook
 
-+ 
+::: {.incremental}
+- Pint: no excuse to write code without units!
+- Quarto: please support your students
+- paper (can be run on Colab):
+  DOI: `10.5194/egusphere-2026-3906`
+:::
+
+. . .
+
+<br>
+
+::: {style="text-align: center;"}
+
+**Thank you for your attention!**
+
+Acknowledgements: Kamil Kania & the paper's co-authors
+
+:::
+
+
+
+
+::: {.notes}
+
 + encourage everyone to support their students in using Pint, Quarto, Habemus Python
-+ AGH Summer/Winter school/workshop on cloud microphysics modelling using the GMD paper?
++ AGH Summer/Winter school/workshop on cloud microphysics modeling using the GMD paper?
 + acknowledgements: Kamil, co-authors, ...
+
+:::
