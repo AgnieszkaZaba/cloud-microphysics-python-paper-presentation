@@ -9,7 +9,7 @@ output-location: fragment
   
 format:
   revealjs:
-    theme: [agh.scss]
+    theme: [style.scss]
     background-transition: fade
     fig-format: svg
     width: 1600
@@ -53,9 +53,8 @@ matplotlib.rcParams.update(
 
 ```
 
-[//]: # (![]&#40;https://www.geoscientific-model-development.net/graphic_egu_claim_logo_blue.png&#41;{width="1em"})
 
-##  an experiment: paper on how to code 
+##  an experiment: paper on how to code  {.AZ}
 
 ![](img/gmd.svg){fig-align="center"}
 
@@ -69,11 +68,11 @@ matplotlib.rcParams.update(
   Introduction
 
 1. aerosol size spectrum sampling     
-2. <span style="color:blue">**unit-aware coding and plotting**</span>  
+2. <span style="color:#287fcc">**unit-aware coding and plotting**</span>  
 3. parcel model governing equations     
 4. JIT compilation using Numba     
 5. parcel ODE system definition     
-6. <span style="color:blue">**test-time dimensional analysis using Pint**     </span>
+6. <span style="color:#287fcc">**test-time dimensional analysis using Pint**     </span>
 7. initial condition at equilibrium     
 8. ODE integration and result analysis     
 9. Super-Droplet Method algorithm    
@@ -81,26 +80,24 @@ matplotlib.rcParams.update(
 
 Summary
 
-<span style="color:blue">**Code availability**</span>
+<span style="color:#287fcc">**Code availability**</span>
 ::: 
 
 ::: {.column width="25%"}
-TODO: Python+Pint logos?
+![](https://www.python.org/static/img/python-logo.png)
+
+![](https://jupyter.org/assets/jupyter/logo/rectanglelogo-greytext-orangebody-greymoons.svg){width="100%"}
+
+![](https://quarto.org/assets/images/quarto.png){width="100%"}
+
 :::
 
 ::::
 
-::: {.notes}
-Must have: physical units ()
-W C++, w Julii, ..
-W Python nie jest to oczywiste jak to zrobić: wyzwaniem jest połączenie z numpy,
-  optymalizacja obliczeń (without overhead...)
-:::
+## `python` as a glue language
 
-
-
-
-## a useful physical example: ideal gas
+# unit-aware coding and plotting
+## a useful physical example: ideal gas {.AZ}
 <br>
 
 :::: {.columns}
@@ -123,19 +120,25 @@ $R$: universal gas constant
 
 ::::
 
-## Issue \#1: units in code (example: ideal gas density)
+## Issue: units in code (example: ideal gas density) {.AZ}
 
 $$\rho = (p M) / (T R)$$
+
+. . .
+
+Spoiler: DON'T
+
+. . .
 
 ```{python}
 #| code-line-numbers: "1|1-2|1-8|"
 
-import numpy, matplotlib.pyplot as plt
-import mendeleev, scipy.constants as ct
+import numpy, scipy, matplotlib.pyplot as plt
+import mendeleev
 
 p = 1000                                     # pressure [mbar]
 T = numpy.linspace(250, 300)                 # temperature [K]
-R = ct.R                                     # gas constant [J/K/mol]
+R = scipy.constants.R                        # gas constant [J/K/mol]
 M = (0.78 * 2 * mendeleev.N.atomic_weight +  # molar mass [g/mol]
      0.22 * 2 * mendeleev.O.atomic_weight)
 
@@ -144,23 +147,38 @@ axs.plot(T, (p * M) / (R * T))
 axs.set(ylabel="density", xlabel="temperature")
 ```
 
+. . .
 
-::: {.fragment}
+The interpreter is not parsing the comments!
+On the paper we always use units, use it in code as well.
 
-TODO: red cross
+## Issue: units in comments not in code {.AZ}
 
-- The interpreter is not parsing the comments!
-
-- What is the unit of the plotted data? 
+::: {.incremental}
+- What is the unit of the plotted data? Is it a correct one?
 - Reading the code, one needs to go to the definition each time.
 - No way of enforcing changes in usage upon change of definition.
 - After changing the value --- did you change the comment?
-
-How to fix it? 
-
+- We all know the answer...
 :::
 
-## physical units in code with Pint
+
+## Issue: units in comments not in code {.AZ}
+
+“_<quote>The proper use of comments is to compensate for our failure to express ourself in code ... 
+Comments are always failures.</quote>_”
+
+<br>
+
+**Robert C. Martin**<br> Clean Code: A Handbook of Agile Software Craftsmanship
+
+. . .
+
+### How to fix our example?
+
+
+
+## physical units in code with Pint {.AZ}
 
 <br> <br>
 
@@ -180,7 +198,7 @@ How to fix it?
 ::::
 
 
-## physical units with Pint (example: ideal gas density)
+## physical units with Pint (example: ideal gas density) {.AZ}
 
 $$\rho = (p M) / (T R)$$
 
@@ -193,17 +211,21 @@ SI.setup_matplotlib()
 
 pressure = 1000 * SI.mbar
 temperatures = numpy.linspace(250, 300) * SI.K
-gas_const = ct.R * SI.J / SI.K / SI.mol
+gas_const = scipy.constants.R * SI.J / SI.K / SI.mol
 molar_mass = (0.78 * 2 * mendeleev.N.atomic_weight +
               0.22 * 2 * mendeleev.O.atomic_weight) * SI.g / SI.mol
 
 plt.plot(temperatures, (pressure * molar_mass) / (gas_const * temperatures))
 ```
 
-Note: axis labels automatic!
+. . .
 
----
+::: {.incremental}
+- changed names of variables
+- axis labels automatic
+:::
 
+## 
 ### Can we ...
 
 ::: {.fragment}
@@ -214,15 +236,39 @@ Note: axis labels automatic!
 ::: {.fragment}
 ```{python}
 fig, axs = plt.figure(), plt.gca()
+
 axs.xaxis.set_units(SI.degC)
 axs.yaxis.set_units(SI.kg / SI.m**3)
+
+axs.plot(temperatures, (pressure * molar_mass) / (gas_const * temperatures))
+```
+:::
+
+::: {.fragment}
+- ... change axes labels and still use units?
+:::
+
+::: {.fragment}
+
+```{python}
+fig, axs = plt.figure(), plt.gca()
 axs.plot(temperatures, (pressure * molar_mass) / (gas_const * temperatures))
 
 axs.set_xlabel(f"temperature [{axs.xaxis.units:~P}]")
 axs.set_ylabel(f"density [{axs.yaxis.units:~P}]");
 ```
-
 :::
+
+::: {.notes}
+to_base_units
+pretty formatting
+:::
+
+## test-time dimensional analysis using Pint {.AZ}
+
+. . .
+
+### Can we ...
 
 ::: {.fragment}
 
@@ -239,9 +285,7 @@ plt.plot(pressure)
 ```
 :::
 
----
 
-### Can we ...
 
 ::: {.fragment}
 
@@ -261,7 +305,8 @@ except Exception as e:
 ```
 :::
 
-<br>
+## {.AZ}
+### Can we ...
 
 ::: {.fragment}
 
@@ -274,7 +319,7 @@ except Exception as e:
 ```{python}
 #| error: true
 
-temperatures + molar_mass
+temperatures + pressure
 ```
 
 :::
@@ -291,7 +336,7 @@ temperatures + molar_mass
 
 :::
 
----
+## {.AZ}
 
 ### Pint: key takeaways
 
@@ -319,7 +364,7 @@ temperatures + molar_mass
 
 
 
-## Issue \#2: units with `scipy` and `numba`
+## Issue: units with `SciPy` and `Numba` {.AZ}
 
 Problem with using units with `scipy`/ `numpy` packages:
 ```{python}
@@ -340,6 +385,8 @@ root_scalar(
 
 ::: {.fragment}
 
+<br>
+
 Problem with using just-in-time compilation (`numba`)
 ```{python}
 #| code-line-numbers: "1|1-5|"
@@ -353,7 +400,9 @@ print(f"{f(2, -3, 270):.3g}")
 ```
 :::
 
+::: {.notes}
 TODO: minimal error mode
+:::
 
 ::: {.fragment}
 ```{python}
@@ -364,19 +413,13 @@ f(2 * SI.K**2, -3 * SI.K, 270 * SI.K)
 
 ::: 
 
-::: {.fragment}
+## How to use units with `scipy` and `numba`? {.AZ}
 
-<br>
-
-#### How to solve it?
-:::
-
-::: {.fragment}
 `see Section 4. in our paper!`
 
-:::
+TODO: Concept
 
-## no excuse for coding without units, let's&nbsp;teach&nbsp;it!
+## no excuse for coding without units, let's&nbsp;teach&nbsp;it! {.SA}
 
 :::: {.columns style="font-size: 0.5em;"}
 
@@ -408,29 +451,26 @@ EuroScipy 2026 (Jul, **Wydział Informatyki AGH**)
 
 ::::
 
-## looking for a venue to publish it: GMD 
+## looking for a venue to publish it: GMD {.SA}
 
 + idea: code-in-paper
 + paper serving as ready-to-use workshop materials
 + GMD requirements: all figures reproducible by editors, reviewers, readers
 + our answer: everything in a single Jupyter notebook (i.e. single click generation of the paper pdf!)
 
-## For reproducible science use ![Quarto](img/quarto-icon.svg){ style="height:1em" } `Quarto`
+## For reproducible science use `Quarto` {.AZ}
+... like the paper and this presentation (including code execution)
 
 <iframe src="https://quarto.org" width="100%" height="75%"></iframe>
 
 
-##
 
-Many [extensions](https://quarto.org/docs/extensions/listing-journals.html) with journal templates, including:
 
-<iframe src="Quarto Journals.htm" width="100%" height="75%"></iframe>
-
-## 
+## {.AZ}
 ### `quarto render paper.ipynb --execute --to copernicus-pdf`
 <iframe src="paper.pdf#page=30" width="100%" height="100%"></iframe>
 
-## simple setup for `.ipynb`, `.qmd` files [etc.](https://quarto.org/docs/get-started/)
+## simple setup for `.ipynb`, `.qmd` files [etc.](https://quarto.org/docs/get-started/) {.AZ}
 
 - example run
 ```{bash}
@@ -456,11 +496,18 @@ execute:
   enabled: true
 ```
 
----
+## {.AZ}
+
+Many extensions with journal templates, including:
+
+<iframe src="Quarto Journals.htm" width="100%" height="75%"></iframe>
+
+
+## {.AZ}
+
 ### Quarto: key takeaways
 
 ::: {.incremental}
-- reproducible!!! 
 - for everyone
 - journal templates as alternative to LaTeX templates
 - executable code for reproducible results (no copy-paste)
@@ -470,7 +517,7 @@ execute:
 
 
 
-## Habemus Python 
+## Habemus Python {.SA}
 
 :::: {.columns}
 
@@ -483,7 +530,7 @@ execute:
 
 ::::
 
-## Quarto Actions
+## Quarto Actions {.SA}
 
 TODO
 
