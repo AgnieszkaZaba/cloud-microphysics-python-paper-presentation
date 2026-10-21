@@ -43,25 +43,3 @@ jobs:
         with:
           name: slides
           path: slides.html
-
-
-      - name: Install browser and GIF tools
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y imagemagick
-          python -m pip install playwright
-          python -m playwright install --with-deps chromium
-
-      - name: Render Reveal.js presentation
-        run: quarto render slides.qmd
-
-      - name: Capture slides and create GIF
-        run: python scripts/slides_to_gif.py slides.html slides.gif
-
-      - name: Upload GIF artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: quarto-slides-gif
-          path: slides.gif
-          if-no-files-found: error
-          retention-days: 14
