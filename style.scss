@@ -12,6 +12,10 @@ $presentation-h1-font-size: 2.2em !default;
   width: auto !important;
 }
 
+.reveal h1 {
+  text-align: center;
+}
+
 figure, img.r-stretch {
   text-align: center!important;
 }
@@ -71,4 +75,11 @@ div.ansi-escaped-output {
     transform: rotate(-30deg);
     pointer-events: none;
   }
+}
+
+.reveal .slide-menu-button {
+  left: auto !important;
+  right: 10px !important;
+  top: 10px !important;
+  bottom: auto !important;
 }

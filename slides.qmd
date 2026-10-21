@@ -62,12 +62,14 @@ matplotlib.rcParams.update(
 ## scope of the paper and <quote>this talk</quote> {.AZ}
 
 :::: {.columns}
-::: {.column width=10%}
+::: {.column width=5%}
 :::
 
 ::: {.column width="65%"}
 
+::: {.fragment}
 <span style="color:#287fcc">Introduction</span>
+:::
 
 1. aerosol size spectrum sampling     
 2. <quote>unit-aware coding and plotting</quote>  
@@ -88,7 +90,7 @@ Summary
 ::: 
 :::
 
-::: {.column width="25%" .fragment}
+::: {.column width="20%" .fragment}
 
 ![](https://www.python.org/static/img/python-logo.png)
 
@@ -125,12 +127,13 @@ The core of the language does not support:
 :::
 ::::
 
+
 But `Python` is designed as a **glue language**!
 
 Above features are handled by packages: **NumPy**(C), **SciPy**(C/Fortran/...), **Numba/JAX**(C++/...), and many more!
 
 
-# unit-aware coding and plotting
+# <quote>unit-aware coding and plotting</quote>
 ## a useful physical example: ideal gas {.AZ}
 <br>
 
@@ -201,8 +204,8 @@ axs.set(ylabel="density", xlabel="temperature")
 . . .
 
 
-“_<quote>The proper use of comments is to compensate for our failure to express ourself in code ... 
-Comments are always failures.</quote>_” (Robert C. Martin [_Clean Code_, 2009](https://books.google.pl/books/about/Clean_Code.html?id=EpeDEQAAQBAJ&redir_esc=y))
+“_The proper use of comments is to compensate for our failure to express ourself in code ... 
+Comments are always failures._” (Robert C. Martin [_Clean Code_, 2009](https://books.google.pl/books/about/Clean_Code.html?id=EpeDEQAAQBAJ&redir_esc=y))
 
 
 ## Issue: units in comments not in code {.AZ} 
@@ -245,7 +248,7 @@ $T$ is time or temperature?
 
 ::: {.column width="50%"}
 
-<iframe src="pages/MetPy_NSF_Unidata.html" width="100%" height="650 pt"></iframe>
+<iframe src="https://unidata.github.io/MetPy/latest/examples/index.html" width="100%" height="650 pt"></iframe>
 
 :::
 ::: {.column width="50%"}
@@ -262,7 +265,7 @@ $T$ is time or temperature?
 $$\rho = (p M) / (T R)$$
 
 ```{python}
-#| code-line-numbers: "1-3|1-5|1-6|1-7|1-9|-"
+#| code-line-numbers: "1|1-2|1-3|1-5|1-6|1-7|1-9|-"
 
 import pint
 SI = pint.UnitRegistry()
@@ -274,7 +277,8 @@ gas_const = scipy.constants.R * SI.J / SI.K / SI.mol
 molar_mass = (0.78 * 2 * mendeleev.N.atomic_weight +
               0.22 * 2 * mendeleev.O.atomic_weight) * SI.g / SI.mol
 
-plt.plot(temperatures, (pressure * molar_mass) / (gas_const * temperatures))
+density = (pressure * molar_mass) / (gas_const * temperatures)
+plt.plot(temperatures, density)
 ```
 
 - changed names of variables
@@ -291,10 +295,12 @@ plt.plot(temperatures, (pressure * molar_mass) / (gas_const * temperatures))
 
 ::: {.fragment}
 ```{python}
+#| code-line-numbers: "|2-3"
+
 fig, axs = plt.figure(), plt.gca()
 axs.xaxis.set_units(SI.degC)
 axs.yaxis.set_units(SI.kg / SI.m**3)
-axs.plot(temperatures, (pressure * molar_mass) / (gas_const * temperatures))
+axs.plot(temperatures, density)
 ```
 :::
 
@@ -305,8 +311,10 @@ axs.plot(temperatures, (pressure * molar_mass) / (gas_const * temperatures))
 ::: {.fragment}
 
 ```{python}
+#| code-line-numbers: "|3-4"
+
 fig, axs = plt.figure(), plt.gca()
-axs.plot(temperatures, (pressure * molar_mass) / (gas_const * temperatures))
+axs.plot(temperatures, density)
 axs.set_xlabel(f"temperature [{axs.xaxis.units:~P}]")
 axs.set_ylabel(f"density [{axs.yaxis.units:~P}]");
 ```
@@ -317,10 +325,9 @@ to_base_units
 pretty formatting
 :::
 
-## dimensional analysis using Pint {.AZ}
+# <quote>dimensional analysis using Pint</quote> {.AZ}
 
-. . .
-
+## {.AZ}
 ### Can we ...
 
 ::: {.fragment}
@@ -348,6 +355,7 @@ plt.plot(pressure)
 
 ```{python}
 #| error: true
+#| code-line-numbers: "|2-3"
 try:
     plt.plot(temperatures)
     plt.plot(temperatures ** 2)
@@ -378,9 +386,9 @@ temperatures + pressure
 
 <br>
 
-::: {.fragment}
-
 - Tools for unit testing:
+
+::: {.fragment}
 
 ```{python}
 ((pressure * molar_mass) / (gas_const * temperatures)).check("[density]")
@@ -388,6 +396,12 @@ temperatures + pressure
 
 :::
 
+::: {.fragment}
+
+```{python}
+assert density.check("[density]")
+```
+:::
 ## {.AZ}
 
 ### Pint: key takeaways
@@ -415,7 +429,7 @@ temperatures + pressure
 :::
 
 
-
+# **JIT compilation using Numba** {.SA}
 
 ## Issue: units with `SciPy` and `Numba` {.SA}
 
@@ -571,16 +585,15 @@ EuroScipy 2026 (Jul, **Wydział Informatyki AGH**)
 
 :::
 ::::
+
+# <quote> Code availability </quote>
+
 ## For reproducible science use `Quarto.org` {.AZ}
 
 <iframe src="https://quarto.org" width="100%" height="75%"></iframe>
 
 $\rightarrow$ Get started
 
-::: {.notes}
-... like the paper and this presentation (including code execution)
-TODO width of iframes!
-:::
 
 ## For reproducible science use `Quarto` {.AZ}
 ### `quarto render paper.ipynb --execute --to copernicus-pdf`
