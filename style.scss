@@ -56,3 +56,19 @@ div.ansi-escaped-output {
 .reveal .slides section.SA::after {
   background: #287fcc;
 }
+
+.strike-code {
+  position: relative;
+
+  &.visible::after {
+    content: "";
+    position: absolute;
+    top: -350px;
+    left: 10%;
+    width: 70%;
+    height: 9px;
+    background: #ff0000;
+    transform: rotate(-30deg);
+    pointer-events: none;
+  }
+}

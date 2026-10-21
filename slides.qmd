@@ -184,6 +184,8 @@ $$\rho = (p M) / (T R)$$
 
 . . .
 
+<div class="strike-code">
+
 ```{python}
 #| code-line-numbers: "1|1-2|1-8|"
 
@@ -200,7 +202,8 @@ fig, axs = plt.figure(), plt.gca()
 axs.plot(T, (p * M) / (R * T))
 axs.set(ylabel="density", xlabel="temperature")
 ```
-
+<div class="fragment strike-code"></div>
+</div>
 . . .
 
 
@@ -536,7 +539,11 @@ TODO width of iframes!
 
 ## For reproducible science use `Quarto` {.AZ}
 ### `quarto render paper.ipynb --execute --to copernicus-pdf`
-<iframe src="paper.pdf#page=30" width="100%" height="75%"></iframe>
+<iframe
+  src="paper.pdf#page=30&toolbar=0&navpanes=0"
+  style="width: 100%; height: 80vh; border: none;"
+  loading="lazy">
+</iframe>
 
 ## For reproducible science use `Quarto` {.AZ}
 
