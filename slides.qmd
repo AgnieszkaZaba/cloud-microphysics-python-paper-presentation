@@ -55,6 +55,59 @@ matplotlib.rcParams.update(
 ```
 
 
+##  an experiment: paper on how to code  {.AZ}
+
+::: {.notes}
+section titles, iframe widths, logos
+:::
+
+![](img/gmd.svg){fig-align="center"}
+
+## scope of the paper and <quote>this talk</quote> {.AZ}
+
+:::: {.columns}
+::: {.column width=10%}
+:::
+
+::: {.column width="65%"}
+
+<span style="color:#287fcc">Introduction</span>
+
+1. aerosol size spectrum sampling     
+2. <quote>unit-aware coding and plotting</quote>  
+3. parcel model governing equations     
+4. **JIT compilation using Numba**     
+5. parcel ODE system definition     
+6. <quote>test-time dimensional analysis using Pint</quote>
+7. initial condition at equilibrium     
+8. ODE integration and result analysis     
+9. Super-Droplet Method algorithm    
+10. SDM against analytic solution
+
+::: {.fragment}
+Summary
+:::
+::: {.fragment}
+<quote>Code availability</quote>
+::: 
+:::
+
+::: {.column width="25%" .fragment}
+
+![](https://www.python.org/static/img/python-logo.png)
+
+![](https://jupyter.org/assets/jupyter/logo/rectanglelogo-greytext-orangebody-greymoons.svg){width="100%"}
+
+![](https://quarto.org/assets/images/quarto.png){width="100%"}
+
+:::
+
+::::
+
+
+
+
+
 
 
 ## `Python` and modeling? {.AZ}
@@ -82,57 +135,6 @@ The core of the language does not support:
 But `Python` is designed as a **glue language**!
 
 Above features are handled by packages: **NumPy**, **SciPy**, **Numba/JAX**
-
-##  an experiment: paper on how to code  {.AZ}
-
-::: {.notes}
-section titles, iframe widths, logos
-:::
-
-![](img/gmd.svg){fig-align="center"}
-
-## scope of the paper and of this talk {.AZ}
-
-:::: {.columns}
-::: {.column width=10%}
-:::
-
-::: {.column width="65%"}
-
-<span style="color:#287fcc">Introduction</span>
-
-1. aerosol size spectrum sampling     
-2. <quote>unit-aware coding and plotting</quote>  
-3. parcel model governing equations     
-4. JIT compilation using Numba     
-5. parcel ODE system definition     
-6. <quote>test-time dimensional analysis using Pint</quote>
-7. initial condition at equilibrium     
-8. ODE integration and result analysis     
-9. Super-Droplet Method algorithm    
-10. SDM against analytic solution
-
-::: {.fragment}
-Summary
-:::
-::: {.fragment}
-<quote>Code availability</quote>
-::: 
-:::
-
-::: {.column width="25%"}
-![](https://www.python.org/static/img/python-logo.png)
-
-![](https://jupyter.org/assets/jupyter/logo/rectanglelogo-greytext-orangebody-greymoons.svg){width="100%"}
-
-![](https://quarto.org/assets/images/quarto.png){width="100%"}
-
-:::
-
-::::
-
-
-
 
 
 
@@ -213,19 +215,32 @@ Comments are always failures.</quote>_” (Robert C. Martin [_Clean Code_, 2009]
 
 ## Issue: units in comments not in code {.AZ} 
 
-The interpreter is not parsing the comments!
-
-We always use units on paper, use it in code as well.
-
-```{python}
-fig
-```
+The interpreter is not parsing the comments! We always use units on paper, use it in code as well.
 
 - What is the unit of the plotted data?
+
+::: {.fragment}
+```{python}
+#| echo: false
+
+fig
+```
+:::
+
 - Reading the code, one needs to go to the definition each time.
+
+::: {.fragment}
+```{python}
+print(T[0])
+``` 
+:::
+
+::: {.fragment}
+$T$ is time or temperature? 
+:::
+
 - No way of enforcing changes in usage upon change of definition.
-- After changing the value --- did you change the comment? 
-- We all know the answer...
+- After changing the value --- did you change the comment? (We all know the answer...)
 
 
 
