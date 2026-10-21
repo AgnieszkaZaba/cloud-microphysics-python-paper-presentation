@@ -14,6 +14,7 @@ format:
     fig-format: svg
     width: 1600
     height: 1000
+    incremental: true
     menu: 
       side: right
     footer: ZFŚ Seminar, 22.10.2026
@@ -36,8 +37,6 @@ from cycler import cycler
 %config InlineBackend.figure_formats = ['svg']
 matplotlib.rcParams.update(
     {
-        "axes.prop_cycle": cycler(color=("#A71930", "#00693C", "#1E1E1E"))
-        + cycler(linestyle=("-", "--", ":")),
         "lines.linewidth": 1.5,
         "lines.markersize": 5,
         "axes.grid": True,
@@ -95,25 +94,31 @@ section titles, iframe widths, logos
 ## scope of the paper and of this talk {.AZ}
 
 :::: {.columns}
+::: {.column width=10%}
+:::
 
-::: {.column width="75%"}
-  <span style="color:#287fcc">Introduction</span> 
+::: {.column width="65%"}
+
+<span style="color:#287fcc">Introduction</span>
 
 1. aerosol size spectrum sampling     
-2. <span style="color:#287fcc">**unit-aware coding and plotting**</span>  
+2. <quote>unit-aware coding and plotting</quote>  
 3. parcel model governing equations     
 4. JIT compilation using Numba     
 5. parcel ODE system definition     
-6. <span style="color:#287fcc">**test-time dimensional analysis using Pint**     </span>
+6. <quote>test-time dimensional analysis using Pint</quote>
 7. initial condition at equilibrium     
 8. ODE integration and result analysis     
 9. Super-Droplet Method algorithm    
 10. SDM against analytic solution
 
+::: {.fragment}
 Summary
-
-<span style="color:#287fcc">**Code availability**</span>
+:::
+::: {.fragment}
+<quote>Code availability</quote>
 ::: 
+:::
 
 ::: {.column width="25%"}
 ![](https://www.python.org/static/img/python-logo.png)
@@ -136,21 +141,39 @@ Summary
 <br>
 
 :::: {.columns}
+::: {.column width="15%"}
+:::
+::: {.column width="30%"}
 
-::: {.column width="40%"}
-<span style="font-size:400%">🎈</span>
+<span style="font-size:500%">🎈</span>
+
+<span style="font-size:300%">🎈</span>
+
 <span style="font-size:200%">🎈</span>
+
 <span style="font-size:100%">🎈</span>
+
 <span style="font-size:50%">🎈</span>
 :::
 
-::: {.column width="60%"}
+::: {.column width="55%"}
 
-<h4>equation of state linking density $\rho$, pressure&nbsp;$p$ and temperature $T$</h4>
+equation of state linking
+
+>  $\rho$: density
+> 
+>  $p$: pressure
+> 
+>  $T$: temperature
+
 $$\rho = (p M) / (T R)$$
 
-$M$: molar mass
-$R$: universal gas constant
+where
+
+> $M$: molar mass
+> 
+> $R$: universal gas constant
+
 :::
 
 ::::
@@ -194,14 +217,13 @@ We always use units on paper, use it in code as well.
 ```{python}
 fig
 ```
-::: {.incremental}
+
 - What is the unit of the plotted data?
 - Reading the code, one needs to go to the definition each time.
 - No way of enforcing changes in usage upon change of definition.
-- After changing the value --- did you change the comment?
+- After changing the value --- did you change the comment? 
+- We all know the answer...
 
-  We all know the answer...
-:::
 
 
 
@@ -245,12 +267,9 @@ molar_mass = (0.78 * 2 * mendeleev.N.atomic_weight +
 plt.plot(temperatures, (pressure * molar_mass) / (gas_const * temperatures))
 ```
 
-. . .
-
-::: {.incremental}
 - changed names of variables
 - axis labels automatic
-:::
+
 
 ## 
 ### Can we ...
@@ -363,25 +382,24 @@ temperatures + pressure
 
 ### Pint: key takeaways
 
-::: {.incremental}
 - ⚖️ performs dimensional analysis (unit testing!)
 - ⚙️ automates plot axis labelling (and consistency checks)
 - 💱 handles SI prefixes and unit conversions
 - 🩺 helps in debugging (`print(x)` prints a value with unit)
-:::
+
 
 
 ::: {.fragment}
 ### Pint: key limitations
 :::
 
-::: {.fragment}
+::: {.fragment .strike}
 
-- ⏱️ <s>incurs performance overhead</s>
+- ⏱️ incurs performance overhead
 :::
-::: {.fragment}
+::: {.fragment .strike}
 
-- 🔗 <s>no out-of-the-box interoperability with SciPy/Numba</s>
+- 🔗 no out-of-the-box interoperability with SciPy/Numba
 :::
 
 
@@ -491,7 +509,6 @@ EuroScipy 2026 (Jul, **Wydział Informatyki AGH**)
 
 ::: {.column width="80%"}
 
-::: {.incremental}
 + idea: 
   + use cloud-microphysics modeling as an example 
   + code-in-paper 
@@ -503,7 +520,6 @@ EuroScipy 2026 (Jul, **Wydział Informatyki AGH**)
 + tool: 
   + everything in a single `Jupyter notebook` 
   + `Quarto` single click generation of the paper pdf!
-:::
 
 :::
 ::::
@@ -568,12 +584,12 @@ TODO
 
 ## Summary and outlook
 
-::: {.incremental}
+
 - Pint: no excuse to write code without units!
 - Quarto: please support your students
 - paper (can be run on Colab):
   DOI: `10.5194/egusphere-2026-3906`
-:::
+
 
 . . .
 
