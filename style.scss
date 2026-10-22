@@ -24,9 +24,13 @@ span.MathJax, div.MathJax_Display {
   color: #7c0c0c;
 }
 
+red-quote {
+  color: #ba0b0b;
+}
 quote {
   color: #287fcc;
 }
+
 
 .reveal pre code {
   font-size: 1em!important
@@ -67,7 +71,7 @@ div.ansi-escaped-output {
   &.visible::after {
     content: "";
     position: absolute;
-    top: -350px;
+    top: -330px;
     left: 10%;
     width: 50%;
     height: 9px;

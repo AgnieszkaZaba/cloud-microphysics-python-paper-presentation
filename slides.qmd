@@ -213,8 +213,8 @@ axs.set(ylabel="density", xlabel="temperature")
 . . .
 
 
-“_The proper use of comments is to compensate for our failure to express ourself in code ... 
-Comments are always failures._” (Robert C. Martin [_Clean Code_, 2009](https://books.google.pl/books/about/Clean_Code.html?id=EpeDEQAAQBAJ&redir_esc=y))
+“<red-quote>_The proper use of comments is to compensate for our failure to express ourself in code ... 
+Comments are always failures._</red-quote>” (Robert C. Martin [_Clean Code_, 2009](https://books.google.pl/books/about/Clean_Code.html?id=EpeDEQAAQBAJ&redir_esc=y))
 
 
 ## Issue: units in comments not in code {.AZ} 
@@ -429,7 +429,7 @@ assert density.check("[density]")
 <br>
 
 ::: {.fragment}
-### Pint: key limitations
+### Pint: key (alleged) limitations
 :::
 
 ::: {.fragment .strike}
