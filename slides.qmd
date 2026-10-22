@@ -14,6 +14,7 @@ format:
     fig-format: svg
     width: 1600
     height: 1000
+    incremental: true
     menu: 
       side: right
     footer: ZFŚ Seminar, 22.10.2026
@@ -33,11 +34,8 @@ if ip is not None:
 import matplotlib
 from cycler import cycler
 
-%config InlineBackend.figure_formats = ['svg']
 matplotlib.rcParams.update(
     {
-        "axes.prop_cycle": cycler(color=("#A71930", "#00693C", "#1E1E1E"))
-        + cycler(linestyle=("-", "--", ":")),
         "lines.linewidth": 1.5,
         "lines.markersize": 5,
         "axes.grid": True,
@@ -56,10 +54,58 @@ matplotlib.rcParams.update(
 ```
 
 
+## {.AZ}
+
+![](img/gmd.svg){fig-align="center"}
+
+## scope of the paper and <quote>this talk</quote> {.AZ}
+
+:::: {.columns}
+::: {.column width=5%}
+:::
+
+::: {.column width="65%"}
+
+::: {.fragment}
+<span style="color:#287fcc">Introduction</span>
+:::
+
+1. aerosol size spectrum sampling     
+2. <quote>unit-aware coding and plotting</quote>  
+3. parcel model governing equations     
+4. **JIT compilation using Numba**     
+5. parcel ODE system definition     
+6. <quote>test-time dimensional analysis using Pint</quote>
+7. initial condition at equilibrium     
+8. ODE integration and result analysis     
+9. Super-Droplet Method algorithm    
+10. SDM against analytic solution
+
+::: {.fragment}
+Summary
+:::
+::: {.fragment}
+<quote>Code availability</quote>
+::: 
+:::
+
+::: {.column width="20%" .fragment}
+
+![](https://www.python.org/static/img/python-logo.png)
+
+![](https://jupyter.org/assets/jupyter/logo/rectanglelogo-greytext-orangebody-greymoons.svg){width="100%"}
+
+![](https://quarto.org/assets/images/quarto.png){width="100%"}
+
+:::
+
+::::
+
+
+
 
 
 ## `Python` and modeling? {.AZ}
-
 :::: {.columns}
 ::: {.column width="30%"}
 The core of the language does not support:
@@ -80,77 +126,55 @@ The core of the language does not support:
 :::
 ::::
 
+
 But `Python` is designed as a **glue language**!
 
 Above features are handled by packages: **NumPy**(C), **SciPy**(C/Fortran/...), **Numba/JAX**(C++/...), and many more!
 
-## {.AZ}
 
-::: {.notes}
-section titles, iframe widths, logos
-:::
-
-![](img/gmd.svg){fig-align="center"}
-
-## scope of the paper and of this talk {.AZ}
-
-:::: {.columns}
-
-::: {.column width="75%"}
-  <span style="color:#287fcc">Introduction</span> 
-
-1. aerosol size spectrum sampling     
-2. <span style="color:#287fcc">**unit-aware coding and plotting**</span>  
-3. parcel model governing equations     
-4. JIT compilation using Numba     
-5. parcel ODE system definition     
-6. <span style="color:#287fcc">**test-time dimensional analysis using Pint**     </span>
-7. initial condition at equilibrium     
-8. ODE integration and result analysis     
-9. Super-Droplet Method algorithm    
-10. SDM against analytic solution
-
-Summary
-
-<span style="color:#287fcc">**Code availability**</span>
-::: 
-
-::: {.column width="25%"}
-![](https://www.python.org/static/img/python-logo.png)
-
-![](https://jupyter.org/assets/jupyter/logo/rectanglelogo-greytext-orangebody-greymoons.svg){width="100%"}
-
-![](https://quarto.org/assets/images/quarto.png){width="100%"}
+# <quote>unit-aware coding and plotting</quote>
+::: {style="text-align: center;"}
+section 2 in paper
 
 :::
 
-::::
-
-
-
-
-
-
-# unit-aware coding and plotting
 ## a useful physical example: ideal gas {.AZ}
 <br>
 
 :::: {.columns}
+::: {.column width="15%"}
+:::
+::: {.column width="30%"}
 
-::: {.column width="40%"}
-<span style="font-size:400%">🎈</span>
+<span style="font-size:500%">🎈</span>
+
+<span style="font-size:300%">🎈</span>
+
 <span style="font-size:200%">🎈</span>
+
 <span style="font-size:100%">🎈</span>
+
 <span style="font-size:50%">🎈</span>
 :::
 
-::: {.column width="60%"}
+::: {.column width="55%"}
 
-<h4>equation of state linking density $\rho$, pressure&nbsp;$p$ and temperature $T$</h4>
+equation of state linking
+
+>  $\rho$: density
+> 
+>  $p$: pressure
+> 
+>  $T$: temperature
+
 $$\rho = (p M) / (T R)$$
 
-$M$: molar mass
-$R$: universal gas constant
+where
+
+> $M$: molar mass
+> 
+> $R$: universal gas constant
+
 :::
 
 ::::
@@ -162,46 +186,66 @@ $$\rho = (p M) / (T R)$$
 . . .
 
 ```{python}
-#| code-line-numbers: "1|1-2|1-8|"
-
+%config InlineBackend.figure_formats = ['svg']
 import numpy, scipy, matplotlib.pyplot as plt
 import mendeleev
+```
+. . .
+
+<div class="strike-code">
+
+```{python}
+#| code-line-numbers: "1-5|1-6|"
 
 p = 1000                                     # pressure [mbar]
 T = numpy.linspace(250, 300)                 # temperature [K]
 R = scipy.constants.R                        # gas constant [J/K/mol]
 M = (0.78 * 2 * mendeleev.N.atomic_weight +  # molar mass [g/mol]
      0.22 * 2 * mendeleev.O.atomic_weight)
+rho = (p * M) / (R * T)
 
 fig, axs = plt.figure(), plt.gca()
-axs.plot(T, (p * M) / (R * T))
+axs.plot(T, rho)
 axs.set(ylabel="density", xlabel="temperature")
 ```
-
+<div class="fragment strike-code"></div>
+</div>
 . . .
 
 
-“_<quote>The proper use of comments is to compensate for our failure to express ourself in code ... 
-Comments are always failures.</quote>_” (Robert C. Martin [_Clean Code_, 2009](https://books.google.pl/books/about/Clean_Code.html?id=EpeDEQAAQBAJ&redir_esc=y))
+“_The proper use of comments is to compensate for our failure to express ourself in code ... 
+Comments are always failures._” (Robert C. Martin [_Clean Code_, 2009](https://books.google.pl/books/about/Clean_Code.html?id=EpeDEQAAQBAJ&redir_esc=y))
 
 
 ## Issue: units in comments not in code {.AZ} 
 
-The interpreter is not parsing the comments!
+The interpreter is not parsing the comments! We always use units on paper, use it in code as well.
 
-We always use units on paper, use it in code as well.
+- What is the unit of the plotted data?
 
+::: {.fragment}
 ```{python}
+#| echo: false
+
 fig
 ```
-::: {.incremental}
-- What is the unit of the plotted data?
-- Reading the code, one needs to go to the definition each time.
-- No way of enforcing changes in usage upon change of definition.
-- After changing the value --- did you change the comment?
-
-  We all know the answer...
 :::
+
+- Reading the code, one needs to go to the definition each time.
+
+::: {.fragment}
+```{python}
+print(T[0])
+``` 
+:::
+
+::: {.fragment}
+$T$ is time or temperature? 
+:::
+
+- No way of enforcing changes in usage upon change of definition.
+- After changing the value --- did you change the comment? (We all know the answer...)
+
 
 
 
@@ -213,7 +257,7 @@ fig
 
 ::: {.column width="50%"}
 
-<iframe src="pages/MetPy_NSF_Unidata.html" width="100%" height="650 pt"></iframe>
+<iframe src="https://unidata.github.io/MetPy/latest/examples/index.html" width="100%" height="650 pt"></iframe>
 
 :::
 ::: {.column width="50%"}
@@ -230,7 +274,7 @@ fig
 $$\rho = (p M) / (T R)$$
 
 ```{python}
-#| code-line-numbers: "1-3|1-5|1-6|1-7|1-9|-"
+#| code-line-numbers: "1|1-2|1-3|1-5|1-6|1-7|1-9|-"
 
 import pint
 SI = pint.UnitRegistry()
@@ -242,15 +286,13 @@ gas_const = scipy.constants.R * SI.J / SI.K / SI.mol
 molar_mass = (0.78 * 2 * mendeleev.N.atomic_weight +
               0.22 * 2 * mendeleev.O.atomic_weight) * SI.g / SI.mol
 
-plt.plot(temperatures, (pressure * molar_mass) / (gas_const * temperatures))
+density = (pressure * molar_mass) / (gas_const * temperatures)
+plt.plot(temperatures, density)
 ```
 
-. . .
-
-::: {.incremental}
 - changed names of variables
 - axis labels automatic
-:::
+
 
 ## {.AZ}
 ### Can we ...
@@ -262,10 +304,12 @@ plt.plot(temperatures, (pressure * molar_mass) / (gas_const * temperatures))
 
 ::: {.fragment}
 ```{python}
+#| code-line-numbers: "|2-3"
+
 fig, axs = plt.figure(), plt.gca()
 axs.xaxis.set_units(SI.degC)
 axs.yaxis.set_units(SI.kg / SI.m**3)
-axs.plot(temperatures, (pressure * molar_mass) / (gas_const * temperatures))
+axs.plot(temperatures, density)
 ```
 :::
 
@@ -276,8 +320,10 @@ axs.plot(temperatures, (pressure * molar_mass) / (gas_const * temperatures))
 ::: {.fragment}
 
 ```{python}
+#| code-line-numbers: "|3-4"
+
 fig, axs = plt.figure(), plt.gca()
-axs.plot(temperatures, (pressure * molar_mass) / (gas_const * temperatures))
+axs.plot(temperatures, density)
 axs.set_xlabel(f"temperature [{axs.xaxis.units:~P}]")
 axs.set_ylabel(f"density [{axs.yaxis.units:~P}]");
 ```
@@ -288,10 +334,13 @@ to_base_units
 pretty formatting
 :::
 
-## dimensional analysis using Pint {.AZ}
+# <quote>dimensional analysis using Pint</quote> {.AZ}
+::: {style="text-align: center;"}
+section 6 in paper
 
-. . .
+:::
 
+## {.AZ}
 ### Can we ...
 
 ::: {.fragment}
@@ -319,6 +368,7 @@ plt.plot(pressure)
 
 ```{python}
 #| error: true
+#| code-line-numbers: "|2-3"
 try:
     plt.plot(temperatures)
     plt.plot(temperatures ** 2)
@@ -349,9 +399,9 @@ temperatures + pressure
 
 <br>
 
-::: {.fragment}
-
 - Tools for unit testing:
+
+::: {.fragment}
 
 ```{python}
 ((pressure * molar_mass) / (gas_const * temperatures)).check("[density]")
@@ -359,16 +409,21 @@ temperatures + pressure
 
 :::
 
+::: {.fragment}
+
+```{python}
+assert density.check("[density]")
+```
+:::
 ## {.AZ}
 
 ### Pint: key takeaways
 
-::: {.incremental}
 - ⚖️ performs dimensional analysis (unit testing!)
 - ⚙️ automates plot axis labelling (and consistency checks)
 - 💱 handles SI prefixes and unit conversions
 - 🩺 helps in debugging (`print(x)` prints a value with unit)
-:::
+
 
 <br>
 <br>
@@ -377,15 +432,14 @@ temperatures + pressure
 ### Pint: key limitations
 :::
 
-::: {.fragment}
+::: {.fragment .strike}
 
-- ⏱️ <s>incurs performance overhead</s>
+- ⏱️ incurs performance overhead
 :::
-::: {.fragment}
+::: {.fragment .strike}
 
-- 🔗 <s>no out-of-the-box interoperability with SciPy/Numba</s>
+- 🔗 no out-of-the-box interoperability with SciPy/Numba
 :::
-
 
 
 
@@ -507,58 +561,73 @@ EuroScipy 2026 (Jul, **Wydział Informatyki AGH**)
 
 ::: 
 
-+ **AGH courses**: PP, PI, MUP, MPS, RSE, ...
++ **AGH courses**: PP, PI, MUP, MPS, RSE, MPTS, PTS...
 
 ::::
 
-## looking for a venue and tool to publish it  {.AZ}
+## From executable code to a reproducible scientific paper {.AZ}
 
-:::: {.columns}
-::: {.column width="20%"}
+:::: {.columns gap="1em"}
 
-![](https://raw.githubusercontent.com/open-atmos/PySDM/main/docs/logos/pysdm_logo.svg){width="60%"}
+::: {.column width="30%" .card}
+![](https://raw.githubusercontent.com/open-atmos/PySDM/main/docs/logos/pysdm_logo.svg){.card-logo}
 
-![](https://www.geoscientific-model-development.net/graphic_egu_claim_logo_blue.png)
+### Idea
 
-![](https://jupyter.org/assets/jupyter/logo/rectanglelogo-greytext-orangebody-greymoons.svg)
-
-![](https://quarto.org/assets/images/quarto.png)
-
-
-:::
-
-::: {.column width="80%"}
-
-::: {.incremental}
-+ idea: 
-  + use cloud-microphysics modeling as an example 
-  + code-in-paper 
-  + paper serving as ready-to-use workshop materials 
-  + all figures reproducible by editors, reviewers, readers
-+ venue: 
-  + EGU Geoscientific Model Development: review and perspective paper
-  + reproducibility is required by GMD
-+ tool: 
-  + everything in a single `Jupyter notebook` 
-  + `Quarto` single click generation of the paper pdf!
-:::
+- Cloud microphysics as a case study
+- Executable code embedded in the paper
+- Ready-to-use workshop materials
+- Reproducible results and figures
 
 :::
+
+::: {.column width="30%" .card}
+![](https://www.egu.eu/media/filer_public_thumbnails/filer_public/d6/74/d6743648-b771-4814-bf54-23b3d486dd50/gmd.png__250x250_subsampling-2_upscale.webp){.card-logo}
+
+### Venue
+
+- Geoscientific Model Development (GMD)
+- Review and perspective paper 
+- GMD’s reproducibility requirements
+:::
+
+::: {.column width="30%" .card}
+![](https://jupyter.org/assets/homepage/main-logo.svg){.card-logo}
+![](img/quarto-logo.svg){.card-logo}
+
+### Tools
+
+- Jupyter for executable code
+- Quarto for paper generation
+- Automated tests and reproducible outputs
+:::
+
 ::::
+
+<br><br>
+
+::: {.callout-bottom .fragment style="text-align: center;"}
+### One executable source $\leadsto$ Paper + Figures + Workshop
+
+Reproducible by authors, editors, reviewers, and readers
+:::
+
+
 ## For reproducible science use `Quarto.org` {.AZ}
 
 <iframe src="https://quarto.org" width="100%" height="75%"></iframe>
 
 $\rightarrow$ Get started
 
-::: {.notes}
-... like the paper and this presentation (including code execution)
-TODO width of iframes!
-:::
 
+# <quote> Code availability </quote>
 ## For reproducible science use `Quarto` {.AZ}
 ### `quarto render paper.ipynb --execute --to copernicus-pdf`
-<iframe src="paper.pdf#page=30" width="100%" height="75%"></iframe>
+<iframe
+  src="paper.pdf#page=30&toolbar=0&navpanes=0"
+  style="width: 100%; height: 80vh; border: none;"
+  loading="lazy">
+</iframe>
 
 ## For reproducible science use `Quarto` {.AZ}
 
@@ -574,9 +643,25 @@ TODO width of iframes!
   - $\LaTeX$ syntax
   - vector graphics
 
+. . .
+
+- save rendered `.tex`, `.md` files
+
+. . .
+
+```markdown
+keep-md: true
+keep-tex: true
+```
+
+
 . . . 
 
-This presentation is in `Quarto`, including code execution!
+**This presentation is in `Quarto`, including code execution!**
+
+## Example gallery
+
+<iframe src="https://quarto.org/docs/gallery/" width="100%" height="75%"></iframe>
 
 ## Journal templates from major publishers {.AZ}
 
@@ -649,24 +734,14 @@ This presentation is in `Quarto`, including code execution!
 
 . . .
 
-<br>
+<br><br>
 
 ::: {style="text-align: center;"}
 
-🙏   
+
 **Thank you for your attention!**
 
 acknowledgments: Kamil Kania & the paper co-authors
 
 :::
 
-
-
-
-::: {.notes}
-
-+ encourage everyone to support their students in using Pint, Quarto, Habemus Python
-+ AGH Summer/Winter school/workshop on cloud microphysics modeling using the GMD paper?
-+ acknowledgements: Kamil, co-authors, ...
-
-:::

@@ -7,25 +7,25 @@ $main-font-size: 30px !default;
 $presentation-h1-font-size: 2.2em !default;
 
 .slide-logo {
-  right: 6px !important;
-  max-height: 10% !important;
+  right: 10px !important;
+  max-height: 7% !important;
   width: auto !important;
+}
+
+.reveal h1 {
+  text-align: center;
 }
 
 figure, img.r-stretch {
   text-align: center!important;
 }
 
-figure img, img.r-stretch, center img {
-  border-radius: 5px!important;
-}
-
 span.MathJax, div.MathJax_Display {
-  color: #096025;
+  color: #7c0c0c;
 }
 
 quote {
-  color: #096025;
+  color: #287fcc;
 }
 
 .reveal pre code {
@@ -34,10 +34,6 @@ quote {
 
 div.ansi-escaped-output {
   font-size: 0.8em!important
-}
-
-section#paper p, section#numba-mpi p, center img {
-  background-color: white!important;
 }
 
 .reveal .slide blockquote {
@@ -63,4 +59,51 @@ section#paper p, section#numba-mpi p, center img {
 
 .reveal .slides section.SA::after {
   background: #287fcc;
+}
+
+.strike-code {
+  position: relative;
+
+  &.visible::after {
+    content: "";
+    position: absolute;
+    top: -350px;
+    left: 10%;
+    width: 50%;
+    height: 9px;
+    background: #ff0000;
+    transform: rotate(-30deg);
+    pointer-events: none;
+  }
+}
+
+.reveal .slide-menu-button {
+  left: auto !important;
+  right: 10px !important;
+  top: 10px !important;
+  bottom: auto !important;
+}
+
+.reveal .card {
+  padding: 0 0.6em;
+  font-size: 0.82em;
+}
+
+
+.reveal .card h3 {
+  border-top: 3px solid #3984b6;
+  padding-top: 0.45em;
+  margin-top: 0;
+}
+
+.reveal .card li {
+  margin-bottom: 0.45em;
+}
+
+.reveal img.card-logo {
+  display: block;
+  margin: 0 auto 0.6em;
+  height: 120px;
+  width: auto;
+  max-width: 90%;
 }
