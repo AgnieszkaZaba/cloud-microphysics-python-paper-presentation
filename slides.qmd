@@ -491,7 +491,7 @@ f(2 * SI.K**2, -3 * SI.K, 270 * SI.K)
 
 ## Using `Pint` with `SciPy` solvers or with `Numba` JIT compiler {.SA}
 
-(`see Section 4. in the preprint`, based on MSc thesis of Daria Klimaszewska)
+(`see Section 4. in the preprint`, based on BEng thesis of Daria Klimaszewska)
 
 <center><b>
   injectable constants-catalogue idiom
